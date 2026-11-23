@@ -136,11 +136,18 @@ export function validateContentManifest(input, moduleCatalog) {
   const guides = input.guides ?? [];
   requireValue(Array.isArray(guides) && guides.length <= PROJECT_GUIDE_IDS.length, '项目指南清单无效');
   const projectGuides = guides.map((item) => {
-    object(item, ['id', 'title', 'description', 'path', 'access']);
+    object(item, ['id', 'title', 'description', 'path', 'access', 'previewImage']);
     requireValue(PROJECT_GUIDE_IDS.includes(item.id) && !guideIds.has(item.id), '项目指南标识无效或重复');
     requireValue(['public', 'project'].includes(item.access), '项目指南必须明确访问范围');
     const file = filePath(item.path, 'guides');
     requireValue(!paths.has(file), '业务文件重复声明');
+    if (item.previewImage !== undefined)
+      requireValue(
+        typeof item.previewImage === 'string' &&
+          item.previewImage.endsWith('.png') &&
+          assets.includes(item.previewImage),
+        '指南预览图片必须为已发布的 PNG 资源',
+      );
     guideIds.add(item.id);
     paths.add(file);
     return {
@@ -149,6 +156,7 @@ export function validateContentManifest(input, moduleCatalog) {
       description: text(item.description, 512),
       path: file,
       access: item.access,
+      ...(item.previewImage ? { previewImage: item.previewImage } : {}),
     };
   });
   return {
@@ -473,12 +481,14 @@ export function createProjectContent({
     };
   }
   return {
-    async hasGraph(project) {
-      if (!project.contentKey) return false;
+    async navigationContent(project) {
+      if (!project.contentKey) return { hasGraph: false, guides: [] };
       const { root, contents } = await location();
-      if (contents && !contents.some((entry) => entry.contentKey === project.contentKey)) return false;
+      if (contents && !contents.some((entry) => entry.contentKey === project.contentKey))
+        return { hasGraph: false, guides: [] };
       const { manifest } = await readContentManifest(root, project.contentKey, moduleCatalog);
-      return manifest.moduleKey === project.moduleKey && Boolean(manifest.graph);
+      if (manifest.moduleKey !== project.moduleKey) return { hasGraph: false, guides: [] };
+      return { hasGraph: Boolean(manifest.graph), guides: manifest.guides ?? [] };
     },
     async catalog() {
       const { root, contents } = await location();

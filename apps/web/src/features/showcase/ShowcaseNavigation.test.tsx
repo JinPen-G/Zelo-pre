@@ -32,7 +32,9 @@ vi.mock('./SiteCollaboration', () => ({
   SiteCollaborationControls: () => null,
 }));
 vi.mock('./SiteDocumentation', () => ({
-  SiteDocumentation: () => <h1>文档介绍</h1>,
+  SiteDocumentation: ({ projectGuide }: { projectGuide?: string }) => (
+    <h1>{projectGuide === 'mind-map' ? '平台脑图正文' : '文档介绍'}</h1>
+  ),
 }));
 vi.mock('./SiteLanding', () => ({ SiteLanding: () => <h1>网站首页</h1> }));
 vi.mock('../../../../../packages/preview-ui/src/BrandOpening', () => ({
@@ -118,7 +120,15 @@ vi.mock('./showcase-catalog', async (importOriginal) => {
     useShowcaseProjects: () => ({
       data: {
         projects: [
-          { id: 'rental', name: 'RIMO Rental', hasGraph: true },
+          {
+            id: 'rental',
+            name: 'RIMO Rental',
+            hasGraph: true,
+            diagramGuides: [
+              { id: 'architecture', title: '平台架构图', access: 'public' },
+              { id: 'mind-map', title: '平台脑图', access: 'public' },
+            ],
+          },
           { id: 'components', name: '组件中心', hasGraph: false },
           { id: 'store', name: '门市项目', hasGraph: true },
         ],
@@ -267,6 +277,25 @@ describe('showcase catalog navigation', () => {
     fireEvent.click(within(graphs).getByRole('link', { name: 'RIMO Rental' }));
     expect(await screen.findByRole('textbox', { name: '搜索需求点' })).toBeInTheDocument();
     expect(screen.getByRole('complementary', { name: '项目页面导航' })).toBe(sidebar);
+  });
+  it('opens a diagram directly below its project graph and keeps the selected guide searchable', async () => {
+    mount('/docs');
+    const graphs = screen.getByRole('navigation', { name: '知识图谱' });
+    expect(
+      within(graphs)
+        .getAllByRole('link')
+        .map((link) => link.textContent),
+    ).toEqual(['RIMO Rental', '平台架构图', '平台脑图', '门市项目']);
+    const rental = within(graphs).getByRole('group', { name: 'RIMO Rental' });
+    expect(within(rental).getByRole('link', { name: '平台架构图' })).toBeInTheDocument();
+    const mindMap = within(rental).getByRole('link', { name: '平台脑图' });
+    expect(mindMap).toHaveAttribute('href', '/docs/projects/rental/mind-map');
+    fireEvent.click(mindMap);
+    expect(await screen.findByRole('heading', { name: '平台脑图正文' })).toBeInTheDocument();
+    expect(mindMap).toHaveAttribute('aria-current', 'page');
+    const sidebar = screen.getByRole('complementary', { name: '项目页面导航' });
+    fireEvent.change(within(sidebar).getByRole('textbox'), { target: { value: '脑图' } });
+    expect(within(graphs).getAllByRole('link')).toEqual([mindMap]);
   });
   it('opens the selected project graph, highlights its own row and remembers it for Demo', async () => {
     mount('/docs/projects/store/graph');

@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { SHOWCASE_MODULES, showcaseModules } from '../../platform-contracts/src/showcase.js';
 import { COMPONENT_REGISTRY } from '../../platform-contracts/src/component-registry.js';
+import { PROJECT_DIAGRAM_GUIDES } from '../../platform-contracts/src/project-guides.js';
 import {
   loadComponentRegistryItem,
   requireComponentRegistryAccess,
@@ -15,6 +16,7 @@ import { fail } from '../../project-core/src/platform/store.js';
 import { requireScope, requireProjectComponent } from '../../project-core/src/platform/agent-context.js';
 import { mapWithConcurrency, resolveExistingPathInsideRoot } from '../../project-core/src/filesystem.js';
 import {
+  canReadDocument,
   pageDocuments,
   requireDocumentAccess,
   readableDocuments,
@@ -166,12 +168,23 @@ export function createShowcaseHandler({
       const entries = await mapWithConcurrency([...projects.values()], 8, async (page) => {
         const { projectId: id, projectName: name, clientId, pageKey } = page;
         const { project } = store.pageAccess(user, id, clientId, pageKey);
-        const hasGraph = await content.hasGraph(project).catch(() => undefined);
+        const navigation = await content.navigationContent(project).catch(() => undefined);
         const currentUser = store.authenticate(cookies(request))?.user ?? null;
         try {
           const current = store.pageAccess(currentUser, id, clientId, pageKey).project;
-          if (current.revision === project.revision) return { id, name, hasGraph };
-          return { id, name: current.name };
+          if (!navigation || current.revision !== project.revision) return { id, name: current.name };
+          const diagramGuides = PROJECT_DIAGRAM_GUIDES.flatMap((guideId) => {
+            const guide = navigation.guides.find((item) => item.id === guideId);
+            return guide && canReadDocument(store, currentUser, current, { ...guide, pages: [] })
+              ? [{ id: guide.id, title: guide.title, access: guide.access }]
+              : [];
+          });
+          return {
+            id,
+            name,
+            hasGraph: navigation.hasGraph,
+            ...(diagramGuides.length ? { diagramGuides } : {}),
+          };
         } catch (error) {
           if (![401, 403, 404].includes(error.status)) throw error;
           return null;
@@ -211,7 +224,9 @@ export function createShowcaseHandler({
       return true;
     }
     const graphRoute =
-      /^\/api\/native\/showcase\/([a-z0-9-]+)\/(graph|graph-query|graph-document|guides)$/.exec(url.pathname);
+      /^\/api\/native\/showcase\/([a-z0-9-]+)\/(graph|graph-query|graph-document|guides|guide-preview)$/.exec(
+        url.pathname,
+      );
     if (graphRoute) {
       const [, projectId, resource] = graphRoute;
       const first = store.pageCatalog(user).find((page) => page.projectId === projectId);
@@ -224,7 +239,6 @@ export function createShowcaseHandler({
           : await content.snapshot(project, url.searchParams.get('contentRevision') ?? undefined, {
               includePrototypes: resource === 'graph' || resource === 'graph-query',
             });
-      const allowed = snapshot ? readableDocuments(store, user, project, snapshot) : [];
       const requireCurrentAccess = () => {
         const nowUser = store.authenticate(cookies(request))?.user ?? null;
         const nowProject = first
@@ -258,6 +272,20 @@ export function createShowcaseHandler({
         });
         return true;
       }
+      if (resource === 'guide-preview') {
+        const current = requireCurrentAccess();
+        const guide = snapshot?.manifest.guides?.find((item) => item.id === url.searchParams.get('id'));
+        if (!guide?.previewImage || !canReadDocument(store, current, project, { ...guide, pages: [] }))
+          fail(404, '指南预览不存在或无权访问', 'NOT_FOUND');
+        response.writeHead(200, {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'no-store',
+          'X-Content-Type-Options': 'nosniff',
+        });
+        response.end(readContentFile(snapshot, guide.previewImage).bytes);
+        return true;
+      }
+      const allowed = snapshot ? readableDocuments(store, user, project, snapshot) : [];
       if (resource === 'graph-document') {
         const document = allowed.find((item) => item.id === url.searchParams.get('id'));
         if (!document) fail(404, '需求不存在或无权访问', 'NOT_FOUND');

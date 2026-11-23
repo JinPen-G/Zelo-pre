@@ -29,6 +29,8 @@ const english: Record<string, string> = {
   跳过开场: 'Skip intro',
   图谱预览: 'Graph preview',
   关系图谱: 'Relationship graph',
+  平台架构图: 'Platform architecture',
+  平台脑图: 'Platform mind map',
   知识图谱: 'Knowledge Graphs',
   暂无知识图谱: 'No knowledge graphs yet',
   没有匹配内容: 'No matching content',

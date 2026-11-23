@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { useNativeAuth } from '@/features/platform/platform-api';
+import type { ProjectDiagramGuideId } from '../../../../../packages/platform-contracts/src/project-guides';
 
 export interface CatalogPage {
   projectId: string;
@@ -23,6 +24,7 @@ export interface ShowcaseProject {
   id: string;
   name: string;
   hasGraph?: boolean;
+  diagramGuides?: { id: ProjectDiagramGuideId; title: string; access: 'public' | 'project' }[];
 }
 export function useShowcaseProject(
   requested: string | null | undefined,

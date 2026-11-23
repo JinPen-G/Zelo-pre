@@ -1,1 +1,1 @@
-export { PROJECT_GUIDE_IDS } from '../../project-shared/src/project-guides.js';
+export { PROJECT_DIAGRAM_GUIDES, PROJECT_GUIDE_IDS } from '../../project-shared/src/project-guides.js';

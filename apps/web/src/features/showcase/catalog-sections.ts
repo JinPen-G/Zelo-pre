@@ -1,4 +1,5 @@
 import type { CatalogPage } from './showcase-catalog';
+import type { ProjectDiagramGuideId } from '../../../../../packages/platform-contracts/src/project-guides';
 
 export const catalogSections = [
   { kind: 'component', title: '组件', path: '/components' },
@@ -9,6 +10,15 @@ export const catalogSections = [
 export type CatalogKind = (typeof catalogSections)[number]['kind'];
 export type CatalogJumpKind = CatalogKind | 'graph';
 export const graphSection = { kind: 'graph', title: '知识图谱' } as const;
+export const diagramGuideTitles = { architecture: '平台架构图', 'mind-map': '平台脑图' } as const;
+
+export function isDiagramGuide(id: string | undefined): id is ProjectDiagramGuideId {
+  return id === 'architecture' || id === 'mind-map';
+}
+
+export function projectDiagramPath(projectId: string, id: ProjectDiagramGuideId) {
+  return `/docs/projects/${encodeURIComponent(projectId)}/${id}`;
+}
 
 export function projectGraphPath(projectId: string) {
   return `/docs/graph?project=${encodeURIComponent(projectId)}`;

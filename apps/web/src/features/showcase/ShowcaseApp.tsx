@@ -67,6 +67,8 @@ import {
   catalogPageTitle,
   catalogSections,
   graphSection,
+  isDiagramGuide,
+  projectDiagramPath,
   projectGraphPath,
   sectionForPath,
   type CatalogJumpKind,
@@ -829,7 +831,11 @@ function Site() {
     appearanceTrigger = useRef<HTMLButtonElement>(null);
   const projectCatalog = useShowcaseProjects(!administration);
   const allCatalogs = useShowcaseCatalog(projectCatalog.data?.projects ?? [], !administration);
-  const projectDocs = /^\/docs\/projects\/([a-z0-9-]+)(?:\/(changelog|graph))?$/.exec(location.pathname);
+  const projectDocs = /^\/docs\/projects\/([a-z0-9-]+)(?:\/(changelog|graph|architecture|mind-map))?$/.exec(
+    location.pathname,
+  );
+  const projectGuide = projectDocs?.[2];
+  const diagramGuide = isDiagramGuide(projectGuide) ? projectGuide : undefined;
   const displayedProject = useShowcaseProject(
     /^\/pages\/([a-z0-9-]+)\//.exec(location.pathname)?.[1] ??
       projectDocs?.[1] ??
@@ -853,28 +859,34 @@ function Site() {
   const selected = pages.find((page) => pageLink(page) === location.pathname);
   const section = sectionForPath(location.pathname);
   const selectedKind = selected ? catalogKind(selected) : (section?.kind ?? 'page');
-  const isGraph = projectDocs?.[2] === 'graph' || location.pathname === '/docs/graph';
+  const isGraph = projectGuide === 'graph' || location.pathname === '/docs/graph';
   const graphProjectId = projectDocs?.[1] ?? displayedProject;
   const graphMenuKey = projectGraphPath(graphProjectId);
   const sidebarActiveKey = isGraph ? graphMenuKey : location.pathname;
   const graphPageProject = projectCatalog.data?.projects.find((project) => project.id === graphProjectId);
   const sidebarSearchTerm = filter.trim().toLowerCase();
-  const graphProjects = (projectCatalog.data?.projects ?? []).filter(
-    (project) =>
+  const graphProjects = (projectCatalog.data?.projects ?? []).flatMap((project) => {
+    const matches = (label: string) =>
+      `${project.name} ${label} ${text(label)}`.toLowerCase().includes(sidebarSearchTerm);
+    const guides = (project.diagramGuides ?? []).filter(
+      (guide) =>
+        matches(guide.title) &&
+        (tier === 'all' || tier === (guide.access === 'public' ? 'public' : 'restricted')),
+    );
+    const showGraph =
       project.hasGraph &&
-      `${project.name} 知识图谱 需求图谱 关系图谱 ${text('知识图谱')} ${text('关系图谱')}`
-        .toLowerCase()
-        .includes(sidebarSearchTerm) &&
-      (tier === 'all' || pages.some((page) => page.projectId === project.id && page.access === tier)),
-  );
-  const navigationRoute = isGraph ? graphMenuKey : location.pathname;
+      matches(`知识图谱 需求图谱 关系图谱 ${text('知识图谱')} ${text('关系图谱')}`) &&
+      (tier === 'all' || pages.some((page) => page.projectId === project.id && page.access === tier));
+    return showGraph || guides.length ? [{ ...project, showGraph, guides }] : [];
+  });
+  const navigationRoute = sidebarActiveKey;
   const [catalogJump, setCatalogJump] = useState<{
     kind: CatalogJumpKind;
     route: string;
     revision: number;
   } | null>(null);
   const activeJump = catalogJump?.route === navigationRoute ? catalogJump : null;
-  const jumpKind = activeJump?.kind ?? (isGraph ? graphSection.kind : selectedKind);
+  const jumpKind = activeJump?.kind ?? (isGraph || diagramGuide ? graphSection.kind : selectedKind);
   const jumpToCatalog = (kind: CatalogJumpKind, panel: HTMLElement | null) => {
     flushSync(() =>
       setCatalogJump({ kind, route: navigationRoute, revision: (catalogJump?.revision ?? 0) + 1 }),
@@ -897,7 +909,7 @@ function Site() {
   );
   const sectionPages = section ? pages.filter((page) => catalogKind(page) === section.kind) : pages;
   const first = sectionPages.find((page) => page.projectId === displayedProject) ?? sectionPages[0];
-  const isDocs = location.pathname.startsWith('/docs') && !isGraph;
+  const isDocs = location.pathname.startsWith('/docs') && !isGraph && !diagramGuide;
   const home = location.pathname === '/';
   const mobileHeader = useNarrowViewport();
   // Move utilities into mobile navigation so the brand can stay at the screen center.
@@ -935,7 +947,9 @@ function Site() {
           <Link
             key={item.kind}
             to={item.path}
-            aria-current={!home && !isDocs && !isGraph && selectedKind === item.kind ? 'page' : undefined}
+            aria-current={
+              !home && !isDocs && !isGraph && !diagramGuide && selectedKind === item.kind ? 'page' : undefined
+            }
           >
             {item.title}
           </Link>
@@ -1052,25 +1066,44 @@ function Site() {
                   count={graphProjects.length}
                   icon={<Icon size={15} strokeWidth={1.75} aria-hidden="true" />}
                   activeKey={
-                    activeJump?.kind === kind ? `jump:${activeJump.revision}` : isGraph ? graphMenuKey : ''
+                    activeJump?.kind === kind
+                      ? `jump:${activeJump.revision}`
+                      : isGraph || diagramGuide
+                        ? sidebarActiveKey
+                        : ''
                   }
                   forceOpen={Boolean(sidebarSearchTerm) && graphProjects.length > 0}
                 >
                   <nav className="library-sidebar_sectionBody__qECt_" aria-label={text(title)}>
                     <div className="library-sidebar_rows__muylU">
                       {graphProjects.map((project) => {
-                        const path = projectGraphPath(project.id);
+                        const rows = project.guides.map((guide) => ({
+                          path: projectDiagramPath(project.id, guide.id),
+                          label: guide.title,
+                          diagram: true,
+                        }));
+                        if (project.showGraph)
+                          rows.unshift({
+                            path: projectGraphPath(project.id),
+                            label: project.name,
+                            diagram: false,
+                          });
                         return (
-                          <Link
-                            key={project.id}
-                            to={path}
-                            data-sidebar-key={path}
-                            className="library-sidebar_row__aE5SY"
-                            aria-current={isGraph && graphProjectId === project.id ? 'page' : undefined}
-                            onClick={() => setMobileOpen(false)}
-                          >
-                            <span className="library-sidebar_label__EP9jR">{project.name}</span>
-                          </Link>
+                          <div key={project.id} role="group" aria-label={project.name}>
+                            {rows.map(({ path, label, diagram }) => (
+                              <Link
+                                key={path}
+                                to={path}
+                                data-sidebar-key={path}
+                                data-project-diagram={diagram || undefined}
+                                className="library-sidebar_row__aE5SY"
+                                aria-current={sidebarActiveKey === path ? 'page' : undefined}
+                                onClick={() => setMobileOpen(false)}
+                              >
+                                <span className="library-sidebar_label__EP9jR">{label}</span>
+                              </Link>
+                            ))}
+                          </div>
                         );
                       })}
                     </div>
@@ -1372,7 +1405,7 @@ function Site() {
                   projectId={projectDocs[1]}
                   path={location.pathname}
                   pages={pages}
-                  projectGuide={projectDocs[2] === 'changelog' ? 'changelog' : 'introduction'}
+                  projectGuide={diagramGuide ?? (projectGuide === 'changelog' ? 'changelog' : 'introduction')}
                 />
               ) : isDocs ? (
                 <SiteDocumentation

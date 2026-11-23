@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowUp, ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
+import { ArrowUp, ArrowLeft, ArrowRight, ChevronRight, RefreshCw } from 'lucide-react';
 import { LoadingStage } from '@preview/ui/loading';
 import type { MarkdownHeading } from '@/features/docs/markdown';
+import type { ProjectDiagramGuideId } from '../../../../../packages/platform-contracts/src/project-guides';
 import { useShowcaseText } from './showcase-locale';
 import { GuideBody } from './GuideBody';
 import { PLATFORM_GUIDES } from '../../../../../packages/project-shared/src/platform-docs';
@@ -11,6 +12,8 @@ import { useProjectGuides } from './project-guide-query';
 import { useTocNavigation } from './toc-navigation';
 import { TocSelection } from './TocSelection';
 import type { CatalogPage } from './showcase-catalog';
+import { diagramGuideTitles, isDiagramGuide, projectDiagramPath, projectGraphPath } from './catalog-sections';
+import { ProjectDiagramPreview } from './ProjectDiagramPreview';
 
 export function SiteDocumentation({
   path,
@@ -21,24 +24,40 @@ export function SiteDocumentation({
   path: string;
   projectId: string;
   pages: CatalogPage[];
-  projectGuide?: 'introduction' | 'changelog';
+  projectGuide?: 'introduction' | 'changelog' | ProjectDiagramGuideId;
 }) {
   const text = useShowcaseText();
   const location = useLocation();
   const query = useProjectGuides(projectGuide ? projectId : '');
+  const diagram = isDiagramGuide(projectGuide) ? projectGuide : undefined;
   const guideIndex = Math.max(
     0,
     siteGuides.findIndex((item) => item.path === path),
   );
   const navigation = projectGuide
-    ? { id: projectGuide, title: projectGuide === 'changelog' ? '更新记录' : '项目介绍', path }
+    ? {
+        id: projectGuide,
+        title: diagram ? diagramGuideTitles[diagram] : projectGuide === 'changelog' ? '更新记录' : '项目介绍',
+        path,
+      }
     : siteGuides[guideIndex];
   const catalog = projectGuide ? (query.isError ? undefined : query.data) : undefined;
   const guides = projectGuide ? catalog?.guides : PLATFORM_GUIDES;
-  useEffect(() => {
-    document.title = [text(navigation.title), catalog?.projectName, 'Preview'].filter(Boolean).join(' · ');
-  }, [navigation.title, catalog?.projectName, text]);
   const guide = guides?.find((item) => item.id === navigation.id);
+  const title = diagram ? (guide?.title ?? navigation.title) : navigation.title;
+  useEffect(() => {
+    const pageTitle = [text(title), catalog?.projectName, 'Preview'].filter(Boolean).join(' · ');
+    const element = document.querySelector('head > title') ?? document.createElement('title');
+    element.replaceChildren(pageTitle);
+    if (!element.isConnected) document.head.append(element);
+  }, [title, catalog?.projectName, text]);
+  const diagramSource = diagram
+    ? guide?.markdown.match(/^```mermaid\r?\n[\s\S]+?\r?\n```(?=\r?\n|$)/)?.[0]
+    : undefined;
+  const diagramImage =
+    diagram && guide && 'previewImage' in guide && guide.previewImage && catalog?.contentRevision
+      ? `/api/native/showcase/${encodeURIComponent(projectId)}/guide-preview?${new URLSearchParams({ id: diagram, contentRevision: catalog.contentRevision })}`
+      : undefined;
   const restricted = catalog?.restrictedGuideIds?.some((identifier) => identifier === navigation.id);
   const [headings, setHeadings] = useState<MarkdownHeading[]>([]);
   const updateHeadings = useCallback(
@@ -51,7 +70,11 @@ export function SiteDocumentation({
       ),
     [],
   );
-  const sectionIds = headings.filter((heading) => heading.level <= 2).map((heading) => heading.id);
+  const outline =
+    diagramSource || diagramImage
+      ? [{ id: 'diagram-preview', text: text('预览'), level: 2 }, ...headings]
+      : headings;
+  const sectionIds = outline.filter((heading) => heading.level <= 2).map((heading) => heading.id);
   const { active, scrollTo } = useTocNavigation(sectionIds, 150);
   const guidePath = useCallback(
     (pathname: string, anchor?: string) =>
@@ -62,6 +85,8 @@ export function SiteDocumentation({
     (file: string, anchor?: string) => {
       const target = guides?.find((item) => item.path === file);
       const route = siteGuides.find((item) => item.id === target?.id);
+      if (projectGuide && isDiagramGuide(target?.id))
+        return `#${guidePath(projectDiagramPath(projectId, target.id), anchor)}`;
       if (projectGuide && (target?.id === 'changelog' || target?.id === 'introduction'))
         return `#/docs/projects/${projectId}${target.id === 'changelog' ? '/changelog' : ''}${anchor ? `?${new URLSearchParams({ anchor })}` : ''}`;
       return route ? `#${guidePath(route.path, anchor)}` : '#';
@@ -73,15 +98,30 @@ export function SiteDocumentation({
     <main className="page_content__xGn__">
       <div className="docs_docLayout__YK0uB">
         <article className="docs_docMain__jK5Ve showcase-guide">
-          <nav className="docs_breadcrumb__JFHCC" aria-label={text('文档')}>
-            <Link to={guidePath('/docs')}>{text('文档')}</Link>
-            <span aria-hidden="true">›</span>
-            <span aria-current="page">{text(navigation.title)}</span>
+          <nav className="docs_breadcrumb__JFHCC" aria-label={text(diagram ? '知识图谱' : '文档')}>
+            {diagram ? (
+              <>
+                <span>{text('知识图谱')}</span>
+                {catalog?.projectName && (
+                  <>
+                    <ChevronRight size={13} strokeWidth={1.75} aria-hidden="true" />
+                    <Link to={projectGraphPath(projectId)}>{catalog.projectName}</Link>
+                  </>
+                )}
+                <ChevronRight size={13} strokeWidth={1.75} aria-hidden="true" />
+              </>
+            ) : (
+              <>
+                <Link to={guidePath('/docs')}>{text('文档')}</Link>
+                <span aria-hidden="true">›</span>
+              </>
+            )}
+            <span aria-current="page">{text(title)}</span>
           </nav>
-          <header className="library-docs_hero__Sm4D7">
+          <header className={diagram ? 'docs_header__0YD_z' : 'library-docs_hero__Sm4D7'}>
             <div className="docs_headerCopy__ZDQWU">
               <div className="docs_titleRow__nNp4A">
-                <h1>{text(navigation.title)}</h1>
+                <h1>{text(title)}</h1>
               </div>
               {guide && <p data-preserve-language>{guide.description}</p>}
             </div>
@@ -114,16 +154,25 @@ export function SiteDocumentation({
               )}
             </div>
           ) : (
-            <div className="library-docs_body__P7yx7" data-preserve-language>
-              <GuideBody
-                source={guide.markdown}
-                documentPath={guide.path}
-                projectId={projectId}
-                resolveDocumentUrl={resolveDocumentUrl}
-                onHeadings={updateHeadings}
-                activeAnchor={new URLSearchParams(location.search).get('anchor') ?? undefined}
-              />
-            </div>
+            <>
+              {diagramImage ? (
+                <ProjectDiagramPreview title={text(title)} imageUrl={diagramImage} />
+              ) : diagramSource ? (
+                <ProjectDiagramPreview title={text(title)} source={diagramSource} />
+              ) : null}
+              <div className="library-docs_body__P7yx7" data-preserve-language>
+                <GuideBody
+                  source={
+                    diagramSource ? guide.markdown.slice(diagramSource.length).trimStart() : guide.markdown
+                  }
+                  documentPath={guide.path}
+                  projectId={projectId}
+                  resolveDocumentUrl={resolveDocumentUrl}
+                  onHeadings={updateHeadings}
+                  activeAnchor={new URLSearchParams(location.search).get('anchor') ?? undefined}
+                />
+              </div>
+            </>
           )}
           {!projectGuide && (
             <nav className="docs_pager__7frTG" aria-label={text('文档导航')}>
@@ -154,7 +203,7 @@ export function SiteDocumentation({
           <nav aria-label={text('本页目录')} className="docs_toc__4bz2v">
             <p className="docs_tocTitle__v_VlL">{text('本页目录')}</p>
             <TocSelection activeKey={active}>
-              {headings
+              {outline
                 .filter((heading) => heading.level <= 2)
                 .map((heading) => (
                   <li key={heading.id}>

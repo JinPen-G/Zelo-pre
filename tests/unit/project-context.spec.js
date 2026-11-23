@@ -23,6 +23,7 @@ vi.mock('../../packages/platform-contracts/src/platform.js', async (original) =>
 test('project guides publish only their declared scope without opening requirement files', async () => {
   const item = await fixture({ server: true });
   const manifest = baseManifest();
+  manifest.assets = ['assets/architecture.png', 'assets/mind-map.png'];
   manifest.guides = [
     {
       id: 'introduction',
@@ -38,27 +39,82 @@ test('project guides publish only their declared scope without opening requireme
       path: 'guides/usage.md',
       access: 'project',
     },
+    {
+      id: 'architecture',
+      title: 'Platform architecture',
+      description: 'Public diagram',
+      path: 'guides/architecture.md',
+      access: 'public',
+      previewImage: 'assets/architecture.png',
+    },
+    {
+      id: 'mind-map',
+      title: 'Private mind map',
+      description: 'Authorized diagram',
+      path: 'guides/mind-map.md',
+      access: 'project',
+      previewImage: 'assets/mind-map.png',
+    },
   ];
   await fs.mkdir(path.join(item.packageRoot, 'guides'));
+  await fs.mkdir(path.join(item.packageRoot, 'assets'));
+  const image = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=',
+    'base64',
+  );
+  for (const asset of manifest.assets) await fs.writeFile(path.join(item.packageRoot, asset), image);
   await fs.writeFile(
     path.join(item.packageRoot, 'guides/introduction.md'),
     '## Product\nPUBLIC-GUIDE-CANARY',
   );
   await fs.writeFile(path.join(item.packageRoot, 'guides/usage.md'), '## Workflow\nPROJECT-GUIDE-CANARY');
+  await fs.writeFile(
+    path.join(item.packageRoot, 'guides/architecture.md'),
+    '## Architecture\nPUBLIC-DIAGRAM',
+  );
+  await fs.writeFile(path.join(item.packageRoot, 'guides/mind-map.md'), '## Mind map\nPROJECT-DIAGRAM');
   await fs.writeFile(path.join(item.packageRoot, 'manifest.json'), JSON.stringify(manifest));
-  const endpoint = `${item.base}/api/native/showcase/${item.project.id}/guides`;
+  const projectEndpoint = `${item.base}/api/native/showcase/${item.project.id}`;
+  const endpoint = `${projectEndpoint}/guides`;
   const anonymous = await fetch(endpoint);
   expect(anonymous.status).toBe(200);
   const publicResult = await anonymous.json();
   expect(publicResult.projectId).toBe(item.project.id);
-  expect(publicResult.guides.map((guide) => guide.id)).toEqual(['introduction']);
-  expect(publicResult.restrictedGuideIds).toEqual(['usage']);
+  expect(publicResult.guides.map((guide) => guide.id)).toEqual(['introduction', 'architecture']);
+  expect(publicResult.guides.find((guide) => guide.id === 'architecture').previewImage).toBe(true);
+  expect(publicResult.restrictedGuideIds).toEqual(['usage', 'mind-map']);
   expect(JSON.stringify(publicResult)).toContain('PUBLIC-GUIDE-CANARY');
   expect(JSON.stringify(publicResult)).not.toContain('PROJECT-GUIDE-CANARY');
+  expect(JSON.stringify(publicResult)).not.toContain('PROJECT-DIAGRAM');
   expect(JSON.stringify(publicResult)).not.toContain('重要机密字段');
   const admin = item.store.login(item.admin.username, 'fixture-password');
   const authorized = await fetch(endpoint, { headers: { cookie: `preview_session=${admin.token}` } });
-  expect((await authorized.json()).guides).toHaveLength(2);
+  expect((await authorized.json()).guides).toHaveLength(4);
+  const previewEndpoint = `${projectEndpoint}/guide-preview`;
+  const architecture = await fetch(
+    `${previewEndpoint}?id=architecture&contentRevision=${publicResult.contentRevision}`,
+  );
+  expect(architecture.headers.get('content-type')).toBe('image/png');
+  expect(Buffer.from(await architecture.arrayBuffer())).toEqual(image);
+  expect((await fetch(`${previewEndpoint}?id=mind-map`)).status).toBe(404);
+  expect((await fetch(`${previewEndpoint}?id=usage&path=assets%2Fmind-map.png`)).status).toBe(404);
+  expect(
+    (await fetch(`${previewEndpoint}?id=mind-map`, { headers: { cookie: `preview_session=${admin.token}` } }))
+      .status,
+  ).toBe(200);
+  const projectsEndpoint = `${item.base}/api/native/showcase/projects`;
+  const publicProjects = await (await fetch(projectsEndpoint)).json();
+  expect(publicProjects.projects.find((project) => project.id === item.project.id).diagramGuides).toEqual([
+    { id: 'architecture', title: 'Platform architecture', access: 'public' },
+  ]);
+  const authorizedProjects = await (
+    await fetch(projectsEndpoint, { headers: { cookie: `preview_session=${admin.token}` } })
+  ).json();
+  expect(
+    authorizedProjects.projects
+      .find((project) => project.id === item.project.id)
+      .diagramGuides.map((guide) => guide.id),
+  ).toEqual(['architecture', 'mind-map']);
   expect((await fetch(`${item.base}/api/native/showcase/nonexistent/guides`)).ok).toBe(false);
   expect(
     (await fetch(`${item.base}/api/native/showcase/${item.project.id}/graph-document?id=usage`)).status,
@@ -68,6 +124,7 @@ test('project guides publish only their declared scope without opening requireme
     { path: '../private.md' },
     { path: 'guides/开发记录.md' },
     { access: undefined },
+    { previewImage: 'assets/undeclared.png' },
   ]) {
     expect(() =>
       validateContentManifest(

@@ -53,6 +53,7 @@ export function readableProjectGuides(store, user, project, snapshot) {
       description: guide.description,
       path: guide.path,
       markdown: snapshot.files.get(guide.path).toString('utf8'),
+      ...(guide.previewImage ? { previewImage: true } : {}),
     }));
 }
 export function requireDocumentAccess(store, user, project, snapshot, file) {
