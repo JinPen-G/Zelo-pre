@@ -1,4 +1,4 @@
-# Preview Web
+# Zelo pre Web
 
 唯一浏览器应用，入口 [main.tsx](src/main.tsx) → [App](src/app/App.tsx)。正式运行使用 既定组件库 风格展示前台；管理员路径进入 Rental OS 风格后台，共用真实身份服务。
 

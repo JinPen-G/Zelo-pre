@@ -1,0 +1,43 @@
+{
+  "brand": "Zelo",
+  "approved": "39",
+  "source": "rental-OS/assets/01_Logo/zelo-logo-bw",
+  "files": [
+    {
+      "sha256": "06a6aa9fd5d17aa755b3be89be2cc00810d52fc4e2555a4613f724df06b317c2",
+      "file": "zelo-badge-black.svg"
+    },
+    {
+      "sha256": "60f5bbd8e45d2e6024eb0601a1c69e65b1bf77424ce3a75cab9e17d887da5ee5",
+      "file": "zelo-badge-white.svg"
+    },
+    {
+      "sha256": "eb67874908e22d2527e831100f5bc6981c4877fe5355576cfca43667408f2ac6",
+      "file": "zelo-favicon.svg"
+    },
+    {
+      "sha256": "2bb79a095974da0244292c274ad5f933749bfeeddcb432599cbc3308ac1967de",
+      "file": "zelo-icon-black.svg"
+    },
+    {
+      "sha256": "a53a34b5cc15a2a695d6190e05f58fc2aa9eaf4285e7b4231e2e4b5b01155670",
+      "file": "zelo-icon-white.svg"
+    },
+    {
+      "sha256": "0dc3754457ad5b6b4ea737ced6aca8d1a3ccae6b77a7b819a68d8546dc1b0bec",
+      "file": "zelo-logo-black.svg"
+    },
+    {
+      "sha256": "b03a29128e84c918f0d112f75ef7d45b5751ca05bff48d9f5dc962681ecf014b",
+      "file": "zelo-logo-white.svg"
+    },
+    {
+      "sha256": "fb60bc11b1b1c83c503d185c5ff08b158faa315270c9aa79d16342114e190700",
+      "file": "zelo-wordmark-black.svg"
+    },
+    {
+      "sha256": "705afc6ca178295a4c803b6c0d72789f3876872fce254fcf2f55d97eb2cd5ea0",
+      "file": "zelo-wordmark-white.svg"
+    }
+  ]
+}

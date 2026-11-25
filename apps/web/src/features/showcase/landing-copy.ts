@@ -5,7 +5,7 @@ export function createLandingCommands(origin: string) {
     {
       id: 'codex',
       label: 'Codex',
-      command: `codex mcp add preview --url ${endpoint} --bearer-token-env-var PREVIEW_MCP_TOKEN`,
+      command: `codex mcp add zelo-pre --url ${endpoint} --bearer-token-env-var PREVIEW_MCP_TOKEN`,
     },
     {
       id: 'cursor',
@@ -13,7 +13,7 @@ export function createLandingCommands(origin: string) {
       command: JSON.stringify(
         {
           mcpServers: {
-            preview: { url: endpoint, headers: { Authorization: 'Bearer <project-read-only-token>' } },
+            'zelo-pre': { url: endpoint, headers: { Authorization: 'Bearer <project-read-only-token>' } },
           },
         },
         null,
@@ -23,7 +23,7 @@ export function createLandingCommands(origin: string) {
     {
       id: 'http',
       label: 'HTTP',
-      command: `curl "${endpoint}" -X POST -H "Authorization: Bearer <project-read-only-token>" -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" --data '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"preview-client","version":"1.0"}}}'`,
+      command: `curl "${endpoint}" -X POST -H "Authorization: Bearer <project-read-only-token>" -H "Content-Type: application/json" -H "Accept: application/json, text/event-stream" --data '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"zelo-pre-client","version":"1.0"}}}'`,
     },
   ];
 }
@@ -53,8 +53,8 @@ export const LANDING_ENGLISH: Record<string, string> = {
   读取需求: 'Requirements',
   读取源码: 'Source code',
   查看更新: 'Updates',
-  '连接 Preview MCP，找到相关需求，先说明规则和验收条件。':
-    'Connect to Preview MCP, find the requirements and explain the rules and acceptance criteria.',
+  '连接 Zelo pre MCP，找到相关需求，先说明规则和验收条件。':
+    'Connect to Zelo pre MCP, find the requirements and explain the rules and acceptance criteria.',
   '调用 `get_project_context`，确认可读范围和资料版本':
     'Read `get_project_context` for access scopes and content versions',
   '用 `search_requirements` 查找，再用 `read_requirement` 读原文':

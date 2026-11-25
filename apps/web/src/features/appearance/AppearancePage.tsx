@@ -186,9 +186,9 @@ export function AppearancePage() {
         <Card size="small" title={text('管理后台主题色', 'Admin theme color', '管理後台主題色')}>
           <Typography.Paragraph type="secondary" className="text-meta" style={{ marginBottom: 12 }}>
             {text(
-              '仅影响当前浏览器中的 Preview 主色；留空使用平台默认色。',
-              'Changes the Preview accent in this browser. Leave empty for the platform default.',
-              '僅影響目前瀏覽器中的 Preview 主色；留空使用平台預設色。',
+              '仅影响当前浏览器中的 Zelo pre 主色；留空使用平台默认色。',
+              'Changes the Zelo pre accent in this browser. Leave empty for the platform default.',
+              '僅影響目前瀏覽器中的 Zelo pre 主色；留空使用平台預設色。',
             )}
           </Typography.Paragraph>
           <div className="arc-color-field preview-color-setting">

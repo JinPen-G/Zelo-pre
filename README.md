@@ -1,6 +1,12 @@
-# Preview
+# Zelo pre
 
-Preview 是面向页面展示、源码复用与 AI 协作的平台框架。它提供前台、管理后台、账号与权限、需求图谱、MCP 和部署工具。仓库附带一个名为“示例”的车组管理页面，用于演示页面接入、源码阅读与 Registry 安装。使用者可继续接入自己的业务内容。
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="packages/preview-ui/src/brand/zelo-logo-white.svg" />
+  <img src="packages/preview-ui/src/brand/zelo-logo-black.svg" alt="Zelo pre" width="260" />
+</picture>
+<sup><code>pre</code></sup>
+
+Zelo pre 是面向页面展示、源码复用与 AI 协作的平台框架。它提供前台、管理后台、账号与权限、需求图谱、MCP 和部署工具。仓库附带一个名为“示例”的车组管理页面，用于演示页面接入、源码阅读与 Registry 安装。使用者可继续接入自己的业务内容。
 
 平台不依赖某个业务项目才能运行。没有业务内容时，账号管理、平台文档、通用工程治理与 MCP 仍可使用，内容目录和图谱显示对应空状态。
 
@@ -35,6 +41,8 @@ Preview 是面向页面展示、源码复用与 AI 协作的平台框架。它�
 环境要求：Node.js 24.13.0 或更新的 24.x 版本，npm 使用仓库锁文件安装依赖。
 
 ```powershell
+git clone https://github.com/JinPen-G/Zelo-pre.git
+cd Zelo-pre
 npm ci
 npm run build:framework
 ```
@@ -48,7 +56,7 @@ $env:PREVIEW_CONTENT_ROOT = (Resolve-Path ./project-content).Path
 node ./runtime/server.mjs --host 127.0.0.1 --port 5190 --origin http://127.0.0.1:5190 --data ../preview-data --bootstrap
 ```
 
-访问 `http://127.0.0.1:5190`，首次自行创建管理员，同时建立“示例”项目。`--bootstrap` 只用于首次初始化，后续启动可移除。SQLite 数据目录放在发行目录外，升级时保留账号、权限和凭证。服务器 CLI 首次初始化时可用 `--with-projects` 建立已登记项目。
+访问 `http://127.0.0.1:5190`，首次自行创建管理员，同时建立“示例”项目。`--bootstrap` 只用于首次初始化，后续启动可移除。SQLite 数据目录放在发行目录外，升级时保留账号、权限和凭证。服务器管理员初始化入口 `runtime/admin.mjs` 可用 `--with-projects` 建立已登记项目。
 
 ## 接入自己的内容
 

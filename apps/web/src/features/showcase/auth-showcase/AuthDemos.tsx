@@ -199,7 +199,7 @@ function ConfirmDemo() {
               {exists ? (
                 <>
                   <FolderClosed size={16} />
-                  <span>Preview example project</span>
+                  <span>Zelo pre example project</span>
                 </>
               ) : (
                 'No projects'
@@ -276,7 +276,7 @@ function ChartDemo() {
   return (
     <section className="line-chart_card__H2N3v">
       <div className="line-chart_top__P5lwX">
-        <h3 className="line-chart_title__QUpqA">Preview activity · demo</h3>
+        <h3 className="line-chart_title__QUpqA">Zelo pre activity · demo</h3>
         <SegmentedControl
           label="Range"
           options={[
@@ -305,7 +305,7 @@ function ChartDemo() {
           { key: 'current', label: 'This period' },
           { key: 'previous', label: 'Previous period', dashed: true },
         ]}
-        label="Preview activity demo"
+        label="Zelo pre activity demo"
         onActiveChange={(_index, datum) => setActive(datum)}
       />
     </section>
@@ -340,7 +340,7 @@ function IconsDemo() {
             aria-label={icon.name === 'copy' ? icon.off : state[icon.name] ? icon.on : icon.off}
             onClick={() =>
               icon.name === 'copy'
-                ? void clipboard.copy('Preview · Prototypes and business requirements')
+                ? void clipboard.copy('Zelo pre · Prototypes and business requirements')
                 : setState((previous) => ({ ...previous, [icon.name]: !previous[icon.name] }))
             }
           >
@@ -379,7 +379,7 @@ function CountdownDemo() {
   return (
     <section className="countdown_card__FoN1G">
       <header>
-        <h3>Preview review · demo</h3>
+        <h3>Zelo pre review · demo</h3>
         <p>Sample schedule · local demo</p>
       </header>
       <div className="countdown_hero__HSdPp">
@@ -529,7 +529,7 @@ function ScrambleDemo() {
       <div className="showcase-scramble-tiles">
         <section>
           <div className="showcase-demo-controls">
-            <span>Preview content</span>
+            <span>Zelo pre content</span>
             <SegmentedControl
               label="Example content"
               options={[

@@ -84,9 +84,9 @@ test('mode tabs switch menus and restore the last admin route; brand popup switc
   expect(screen.queryByRole('link', { name: '项目管理' })).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: '管理控制台' }));
   expect(await screen.findByRole('link', { name: '项目管理' })).toHaveAttribute('aria-current', 'page');
-  fireEvent.click(screen.getByRole('button', { name: 'Preview · 示例项目 A' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Zelo pre · 示例项目 A' }));
   fireEvent.click(await screen.findByRole('menuitem', { name: '示例项目 B' }));
-  expect(await screen.findByRole('button', { name: 'Preview · 示例项目 B' })).toBeInTheDocument();
+  expect(await screen.findByRole('button', { name: 'Zelo pre · 示例项目 B' })).toBeInTheDocument();
   expect(screen.getByRole('link', { name: '订单示例' })).toHaveAttribute('aria-current', 'page');
 });
 

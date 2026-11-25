@@ -342,7 +342,7 @@ if (process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === imp
     throw new Error(
       'Usage: deploy.mjs deploy --archive <file> --sequence <number> | rollback | recover | status [--config <file>]',
     );
-  const config = await readDeploymentConfig(value('--config', '/etc/preview/deploy.json'));
+  const config = await readDeploymentConfig(value('--config', '/etc/zelo-pre/deploy.json'));
   const bootRecover = args.includes('--boot');
   if (bootRecover) {
     if (command !== 'recover') throw new Error('--boot只允许开机恢复');

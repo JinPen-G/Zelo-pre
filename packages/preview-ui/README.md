@@ -1,4 +1,4 @@
-# Preview UI
+# Zelo pre UI
 
 Preview 内维护的前端外壳，固定来源为 Rental OS 提交 `2a66243656a5f4866585fe8fdd757f4b98d022ab`。本包不连接 Rental OS 运行环境，依赖由 Preview 根目录安装，不使用软链接、共享 node_modules 或 file 依赖。
 

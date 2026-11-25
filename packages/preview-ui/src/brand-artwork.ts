@@ -1,40 +1,66 @@
-import { brandCards } from './brand-opening';
+/** Approved assets stay byte-for-byte in brand/; opening motion acts on their in-memory copy. */
+import iconSource from './brand/zelo-icon-black.svg?raw';
+import wordSource from './brand/zelo-wordmark-black.svg?raw';
+import './brand-icon.module.css';
 
-/** Creates only owned brand artwork; the controller keeps these nodes across the startup handoff. */
+function vector(source: string, className: string) {
+  const parsed = new DOMParser().parseFromString(source, 'image/svg+xml');
+  const svg = document.importNode(parsed.documentElement, true) as unknown as SVGSVGElement;
+  svg.querySelectorAll('title, desc').forEach((node) => node.remove());
+  svg.removeAttribute('aria-labelledby');
+  svg.removeAttribute('role');
+  svg.setAttribute('aria-hidden', 'true');
+  svg.setAttribute('focusable', 'false');
+  svg.setAttribute('class', className);
+  svg.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
+  svg.querySelectorAll('[fill="#000000"]').forEach((node) => node.setAttribute('fill', 'currentColor'));
+  return svg;
+}
+
 export function createBrandArtwork(prefix: string) {
-  const iconMount = document.createElement('span'),
-    wordMount = document.createElement('span'),
-    layerMount = document.createElement('span');
+  const iconMount = document.createElement('span');
+  const wordMount = document.createElement('span');
+  const layerMount = document.createElement('span');
   [iconMount, wordMount, layerMount].forEach((mount) => {
     mount.className = 'brand-opening-mount';
   });
-  const shape = (index: number) => {
-    const card = brandCards[index];
-    return `<rect x="${card.x}" y="${card.y}" width="${card.width}" height="${card.height}" rx="${card.rx}" transform="rotate(${card.angle} ${card.cx} ${card.cy})"/>`;
-  };
-  iconMount.innerHTML = `<svg class="brand-opening-symbol" viewBox="48 40 416 416" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-    <defs>${brandCards.map((_, index) => `<g id="${prefix}-occluder-${index}" data-occluder="${index}" fill="black" stroke="black" stroke-width="18" stroke-linejoin="round">${shape(index)}</g>`).join('')}
-    ${brandCards
-      .map(
-        (_, index) =>
-          `<mask id="${prefix}-mask-${index}" data-mask="${index}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect data-mask-background width="512" height="512" fill="white"/><g data-mask-uses>${brandCards
-            .slice(index + 1)
-            .map((_, next) => `<use href="#${prefix}-occluder-${index + next + 1}"/>`)
-            .join('')}</g></mask>`,
-      )
-      .join('')}</defs>
-    <g data-drawing>${brandCards.map((_, index) => `<g data-card-wrapper="${index}" mask="url(#${prefix}-mask-${index})"><g data-card="${index}"><g fill="none" stroke="currentColor" stroke-width="18" stroke-linejoin="round">${shape(index)}</g>${index === 3 ? `<g data-details transform="rotate(-3 235 276)" fill="currentColor"><g data-detail><circle cx="177" cy="219" r="15"/></g><g data-detail><circle cx="222" cy="210" r="15"/></g><g data-detail><rect x="180" y="274" width="112" height="20" rx="10" transform="rotate(-10 236 284)"/></g><g data-detail><rect x="183" y="319" width="108" height="20" rx="10" transform="rotate(-10 237 329)"/></g></g>` : ''}</g></g>`).join('')}</g>
-  </svg>`;
-  const logo = iconMount.querySelector<SVGSVGElement>('svg')!;
+  const logo = vector(iconSource, 'brand-opening-symbol');
+  const snail = logo.querySelector('g')!;
+  snail.setAttribute('data-snail', '');
+  snail.id = `${prefix}-snail`;
+  const trail = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  trail.setAttribute('data-speed-trail', '');
+  trail.setAttribute('stroke', 'currentColor');
+  trail.setAttribute('stroke-width', '6');
+  trail.setAttribute('stroke-linecap', 'round');
+  trail.style.opacity = '0';
+  [
+    [474, 590, 302],
+    [487, 656, 348],
+    [477, 567, 394],
+  ].forEach(([x1, x2, y]) => {
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', String(x1));
+    line.setAttribute('x2', String(x2));
+    line.setAttribute('y1', String(y));
+    line.setAttribute('y2', String(y));
+    trail.append(line);
+  });
+  logo.insertBefore(trail, snail);
+  iconMount.append(logo);
   const word = document.createElement('span');
   word.className = 'brand-opening-word';
   word.setAttribute('aria-hidden', 'true');
-  [...'Preview.'].forEach((character, index) => {
-    const letter = document.createElement('span');
-    letter.dataset.letter = String(index);
-    letter.textContent = character;
-    word.append(letter);
+  const wordmark = vector(wordSource, 'brand-opening-wordmark');
+  [...wordmark.querySelector('g')!.children].forEach((letter, index) => {
+    letter.setAttribute('data-letter', String(index));
   });
+  word.append(wordmark);
+  const preview = document.createElement('span');
+  preview.className = 'brand-preview-badge';
+  preview.setAttribute('data-brand-preview', '');
+  preview.textContent = 'pre';
+  word.append(preview);
   wordMount.append(word);
   const layer = document.createElement('div');
   layer.className = 'brand-opening-layer';

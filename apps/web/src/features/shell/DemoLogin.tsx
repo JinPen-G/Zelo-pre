@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react';
 import { AppleOutlined, GoogleOutlined, WechatOutlined } from '@ant-design/icons';
 import {
   BrandIcon,
+  BrandWordmark,
   Button,
   LoginFrame,
   LoginInput,
@@ -38,9 +39,9 @@ export function DemoLogin({ onLogin }: { onLogin: (session: DemoSession) => void
     setMethod(value);
   };
   const brand = (
-    <span className="preview-login-wordmark">
+    <span className="preview-login-wordmark" role="img" aria-label="Zelo pre">
       <BrandIcon size={36} />
-      <span>Preview</span>
+      <BrandWordmark height={36} />
     </span>
   );
   return (
@@ -70,7 +71,7 @@ export function DemoLogin({ onLogin }: { onLogin: (session: DemoSession) => void
           description: text('随演示查看说明', '隨演示查看說明', 'Read alongside demos'),
         },
       ]}
-      footer={text('Preview · 原型管理平台', 'Preview · 原型管理平台', 'Preview · Prototype workspace')}
+      footer={text('Zelo pre · 原型管理平台', 'Zelo pre · 原型管理平台', 'Zelo pre · Prototype workspace')}
       appearance={
         <>
           <div className="language-toggle" role="group" aria-label={text('切换语言', '切換語言', 'Language')}>
@@ -94,7 +95,7 @@ export function DemoLogin({ onLogin }: { onLogin: (session: DemoSession) => void
       }
     >
       <div className="login-panel-heading">
-        <h2>{text('登录 Preview', '登入 Preview', 'Sign in to Preview')}</h2>
+        <h2>{text('登录 Zelo pre', '登入 Zelo pre', 'Sign in to Zelo pre')}</h2>
         <p>
           {text(
             '使用账号进入你的项目工作台。',

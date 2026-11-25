@@ -8,7 +8,7 @@ command -v certbot >/dev/null
 command -v nginx >/dev/null
 hostname=$(node --input-type=module - <<'NODE'
 import { readFileSync } from 'node:fs';
-const config = JSON.parse(readFileSync('/etc/preview/deploy.json', 'utf8'));
+const config = JSON.parse(readFileSync('/etc/zelo-pre/deploy.json', 'utf8'));
 const origin = new URL(config.publicOrigin);
 if (origin.protocol !== 'https:' || !/^[a-z0-9.-]+$/.test(origin.hostname)) throw new Error('Configure a DNS HTTPS origin first');
 console.log(origin.hostname);

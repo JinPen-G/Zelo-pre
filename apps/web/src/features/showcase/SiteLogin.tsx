@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { BrandIcon, SiteThemeSwitch } from '@preview/ui';
+import { BrandIcon, BrandWordmark, SiteThemeSwitch } from '@preview/ui';
 import { useNativeLoginForm } from '@/features/platform/use-login-form';
 import { usePlatformTheme } from '@/features/theme/platform-theme';
 import { SiteLanguageMenu } from './SiteLanguageMenu';
@@ -62,9 +62,9 @@ export function SiteLogin() {
       <main className="auth-shell_page__OGw1f showcase-auth-mirrored">
         <div className="auth-shell_formSide__amNg7">
           <header className="auth-shell_header__eyvd_">
-            <Link className="auth-shell_brand___SiRY" to="/">
+            <Link className="auth-shell_brand___SiRY" to="/" aria-label="Zelo pre">
               <BrandIcon size={32} />
-              Preview
+              <BrandWordmark height={32} />
             </Link>
             <Link className="auth-shell_back__toVKW" to="/pages">
               <ArrowLeft size={16} />
@@ -73,7 +73,7 @@ export function SiteLogin() {
           </header>
           <div className="auth-shell_formBody__hla4i">
             <div className="auth-shell_intro__GtsgU">
-              <h1>{text(form.initializing ? '初始化平台管理员' : '登录 Preview')}</h1>
+              <h1>{text(form.initializing ? '初始化平台管理员' : '登录 Zelo pre')}</h1>
               <p>
                 {text(
                   form.initializing

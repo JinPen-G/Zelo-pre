@@ -1,4 +1,4 @@
-# Preview 项目与页面接入
+# Zelo pre 项目与页面接入
 
 项目页面直接使用 React 编写，业务需求以明确清单随 Git 发布。代码规范与步骤见[项目模板](../../../templates/project/README.md)，平台不提供 HTML 上传或目录挂载。
 

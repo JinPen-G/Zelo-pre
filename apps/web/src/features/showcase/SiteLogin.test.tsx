@@ -19,6 +19,7 @@ vi.mock('./auth-showcase/AuthShowcase', () => ({ AuthShowcase: () => <div>Intera
 vi.mock('./SiteLanguageMenu', () => ({ SiteLanguageMenu: () => <button>界面语言</button> }));
 vi.mock('@preview/ui', async () => ({
   BrandIcon: (await import('../../../../../packages/preview-ui/src/BrandIcon')).BrandIcon,
+  BrandWordmark: () => <span>Zelo pre</span>,
   SiteThemeSwitch: ({ label }: { label: string }) => <button>{label}</button>,
 }));
 import { SiteLogin } from './SiteLogin';

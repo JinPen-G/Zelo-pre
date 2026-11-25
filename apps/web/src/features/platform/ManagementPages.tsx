@@ -40,7 +40,13 @@ export function SettingsPage() {
       <PageHeading title="平台设置" />
       <Form
         form={form}
-        initialValues={query.data}
+        initialValues={{
+          ...query.data,
+          brandName:
+            !query.data.brandName?.trim() || query.data.brandName === 'Preview'
+              ? 'Zelo pre'
+              : query.data.brandName,
+        }}
         onFinish={(values) => void submit(values)}
         layout="vertical"
         className="native-form-width"

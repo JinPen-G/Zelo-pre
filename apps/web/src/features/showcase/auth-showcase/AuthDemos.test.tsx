@@ -19,5 +19,5 @@ it('shows copied feedback only after clipboard success and keeps denied copying 
   expect(screen.queryByText('Copied')).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Copy example' }));
   expect(await screen.findByText('Copied')).toBeInTheDocument();
-  expect(writeText).toHaveBeenCalledWith('Preview · Prototypes and business requirements');
+  expect(writeText).toHaveBeenCalledWith('Zelo pre · Prototypes and business requirements');
 });

@@ -5,18 +5,18 @@ export const PLATFORM_GUIDES = Object.freeze([
   {
     id: 'introduction',
     title: '介绍',
-    description: '了解Preview、平台内容的组织方式，以及如何阅读和使用一个页面。',
+    description: '了解Zelo pre、平台内容的组织方式，以及如何阅读和使用一个页面。',
     path: 'guides/introduction.md',
-    markdown: `## 什么是 Preview
+    markdown: `## 什么是 Zelo pre
 
-Preview 是用于展示组件、页面区块与产品需求的平台。你可以在这里体验交互、阅读业务原文、查看源码，也可以让开发Agent通过MCP读取同一份需求和实现参考。
+Zelo pre 是用于展示组件、页面区块与产品需求的平台。你可以在这里体验交互、阅读业务原文、查看源码，也可以让开发Agent通过MCP读取同一份需求和实现参考。
 
 每个项目有独立的页面、业务资料和访问范围。平台提供统一的展示、搜索、主题与AI接入方式；项目下的组件和页面通过源码清单独立接入你的React工程。
 
 ## 内容如何组织
 
 <dl>
-<div><dt>平台文档</dt><dd>介绍Preview的使用、主题、动效、需求阅读与AI接入。所有项目共用这份说明。</dd></div>
+<div><dt>平台文档</dt><dd>介绍Zelo pre的使用、主题、动效、需求阅读与AI接入。所有项目共用这份说明。</dd></div>
 <div><dt>内容目录</dt><dd>Screens 按项目组织业务页面。组件与区块按功能分类，已发布的项目图谱集中在侧栏「知识图谱」。</dd></div>
 <div><dt>需求与图谱</dt><dd>页面关联业务需求，图谱提供有原文依据的关系、原型覆盖和改动影响。业务规则以各项目发布的需求原文为准。</dd></div>
 <div><dt>组件与页面源码</dt><dd>预览与源码来自同一实现。安装清单包含样式、辅助文件及依赖，可按项接入目标工程。</dd></div>
@@ -60,7 +60,7 @@ MCP提供组件和页面源码，也提供可独立采用的工程治理规范�
 
 Screens 目录分为三级，依次是 Screens、项目名称、关系图谱与页面。当前项目默认展开，关系图谱位于第一项。页面标题直接使用页面名称，重名条目用小标签区分。组件与区块沿功能分类展开，搜索和访问范围筛选用于缩小范围。
 
-页面提供交互预览、源码和需求说明。页面关联资料可继续追溯业务原文；Docs介绍Preview平台的通用使用方式。
+页面提供交互预览、源码和需求说明。页面关联资料可继续追溯业务原文；Docs介绍Zelo pre平台的通用使用方式。
 
 ## 接入源码前
 
@@ -121,7 +121,7 @@ Screens 目录分为三级，依次是 Screens、项目名称、关系图谱与�
     path: 'guides/theming.md',
     markdown: `## 颜色变量
 
-Preview展示前台使用语义颜色变量。组件说明、源码面板与导航共用这些角色；更换主题时无需逐个修改色值。下方色块直接读取当前页面的主题。
+Zelo pre展示前台使用语义颜色变量。组件说明、源码面板与导航共用这些角色；更换主题时无需逐个修改色值。下方色块直接读取当前页面的主题。
 
 | 变量 | 用途 |
 | --- | --- |
@@ -164,7 +164,7 @@ Screens 与管理后台按控件职责使用默认圆角：内容容器12px、�
 
 \`\`\`html
 <div class="preview-showcase" data-theme="dark" data-accent="neutral">
-  <main>Preview</main>
+  <main>Zelo pre</main>
 </div>
 \`\`\`
 
@@ -178,7 +178,7 @@ Screens 与管理后台按控件职责使用默认圆角：内容容器12px、�
 
 \`\`\`html
 <div class="preview-showcase" data-theme="light" data-accent="green">
-  <main>Preview</main>
+  <main>Zelo pre</main>
 </div>
 \`\`\`
 
@@ -242,7 +242,7 @@ Screens 与管理后台按控件职责使用默认圆角：内容容器12px、�
 
 ## 使用令牌
 
-在 Preview 工程中可以直接使用公共预设。安装到其他项目时，复用该组件实际附带的令牌与依赖。
+在 Zelo pre 工程中可以直接使用公共预设。安装到其他项目时，复用该组件实际附带的令牌与依赖。
 
 \`\`\`tsx
 import { motion, useReducedMotion } from 'motion/react';
@@ -404,9 +404,16 @@ MCP 提供需求和源码上下文。业务写入与真实接口仍由目标业�
   {
     id: 'changelog',
     title: '更新日志',
-    description: 'Preview平台的功能、文档与接入方式更新。',
+    description: 'Zelo pre平台的功能、文档与接入方式更新。',
     path: 'guides/changelog.md',
     markdown: `## 2026 年 11 月
+
+### 11 月 26 日
+
+- 平台名称更新为 Zelo pre，使用黑白蜗牛图形、矢量字标与 pre 标签。
+- 首页载入时蜗牛转向导航位置加速归位；减少动态效果时直接显示静态标志。
+- 顶部外部平台入口更名为 Zelo Saas，GitHub 仓库更新为 JinPen-G/Zelo-pre。
+- 内部 API、环境变量和存储键保持兼容，已有自定义平台名称继续保留。
 
 ### 11 月 19 日
 
@@ -416,7 +423,7 @@ MCP 提供需求和源码上下文。业务写入与真实接口仍由目标业�
 ### 11 月 17 日
 
 - Demo 按业务和页面两级导航，Screens 的项目页面按相同业务顺序排列。
-- 顶部导航新增 Nativark 平台入口。
+- 顶部导航新增 Nativark 平台入口（现名 Zelo Saas）。
 
 ### 11 月 13 日
 

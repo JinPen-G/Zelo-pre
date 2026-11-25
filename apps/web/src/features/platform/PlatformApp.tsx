@@ -120,9 +120,13 @@ function Workspace() {
     admin = user.role === 'admin';
   const projects = useNativeQuery<NativeProject[]>('/projects');
   const settings = useNativeQuery<{ brandName: string; brandIcon: string }>('/settings');
+  // Display the current default brand without overwriting an administrator's saved custom name.
+  const configuredBrandName = settings.data?.brandName;
+  const brandName =
+    !configuredBrandName?.trim() || configuredBrandName === 'Preview' ? 'Zelo pre' : configuredBrandName;
   useEffect(() => {
-    document.title = settings.data?.brandName ?? 'Preview';
-  }, [settings.data?.brandName]);
+    document.title = brandName;
+  }, [brandName]);
   const route = /^\/(?:p|projects)\/([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?$/.exec(location.pathname);
   const centerRoute = /^\/center(?:\/([^/]+))?$/.exec(location.pathname);
   const projectId = centerRoute?.[1] ?? route?.[1] ?? '',
@@ -341,7 +345,7 @@ function Workspace() {
       enabled={Boolean(project && !configuring && !centerMode && !project.archived)}
     >
       <FrameworkShell
-        title={settings.data?.brandName ?? 'Preview'}
+        title={brandName}
         subtitle={(!configuring && project?.name) || (admin ? labels.platform : labels.projects)}
         brand={<BrandIcon />}
         account={user.displayName}

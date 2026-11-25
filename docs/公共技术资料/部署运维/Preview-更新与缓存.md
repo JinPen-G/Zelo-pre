@@ -1,6 +1,8 @@
-# Preview 更新与缓存
+# Zelo pre 更新与缓存
 
-维护日期：2026-11-12。完整自动部署已在本地隔离环境验证；真实 Linux/systemd、nginx、TLS、SSH 与 GitHub Secrets 尚待现场验证。
+维护日期：2026-11-26。本文说明部署合同与安装模板；具体环境的发布状态由运维记录确认。
+
+新安装使用 `/opt/zelo-pre`、`/var/lib/zelo-pre`、`/etc/zelo-pre` 与 `/var/log/zelo-pre-update`。已有旧目录的安装必须先核对服务、配置、持久数据及回退方案，再迁移目录与路径引用，不能直接覆盖模板。服务和系统账号仍保留 `preview` 兼容标识。GitHub 仓库更名后，自动更新配置的 `repository` 必须同步真实仓库名；旧地址重定向不能代替 CI 仓库身份校验。
 
 ## 日常更新
 
@@ -30,15 +32,15 @@ npm run business:package -- --project your-project --output .preview-data/busine
 
 完整构建通过后沿用原发行校验、数据库备份、维护模式、增量迁移和失败恢复。候选服务还必须保留业务页面清单及公开范围，才会激活。成功后记录框架提交和固定业务版本，后续轮询相同版本时跳过构建。
 
-配置文件使用/etc/preview/auto-update.json，其格式示例如下。
+配置文件使用/etc/zelo-pre/auto-update.json，其格式示例如下。
 
 ```json
 {
   "repository": "your-org/your-preview",
   "workflow": "release.yml",
-  "deployConfig": "/etc/preview/deploy.json",
-  "businessPackage": "/var/lib/preview/business/project.json",
-  "workRoot": "/var/lib/preview/update",
+  "deployConfig": "/etc/zelo-pre/deploy.json",
+  "businessPackage": "/var/lib/zelo-pre/business/project.json",
+  "workRoot": "/var/lib/zelo-pre/update",
   "maximumBuildMemoryMiB": 3584,
   "minimumAvailableMemoryMiB": 4608,
   "minimumAvailableDiskMiB": 6144,
@@ -50,7 +52,7 @@ npm run business:package -- --project your-project --output .preview-data/busine
 
 maximumBuildMemoryMiB必须与更新服务的MemoryMax一致。模板限制整个构建服务为3584MiB，Node堆为2816MiB，构建前至少需要4608MiB预算，其中保留1024MiB给宿主。旧配置未设置maximumBuildMemoryMiB时仍按4096MiB构建上限及5120MiB预算校验。资源不足时日志给出实际可用量和所需量，定时任务等待下一轮。
 
-启用此方式时，PREVIEW_DEPLOY_ENABLED保持未设置或false，GitHub仅生成公开框架发行并提供检查结果。服务器通过HTTPS拉取公开代码，私有业务包保存在服务器。该方式不依赖部署SSH私钥或GitHub Secrets。日志通过journalctl -u preview-update.service和私有构建目录last-build.log读取，框架/业务版本记录在/opt/preview/state/auto-update.json。
+启用此方式时，PREVIEW_DEPLOY_ENABLED保持未设置或false，GitHub仅生成公开框架发行并提供检查结果。服务器通过HTTPS拉取公开代码，私有业务包保存在服务器。该方式不依赖部署SSH私钥或GitHub Secrets。日志通过journalctl -u preview-update.service和私有构建目录last-build.log读取，框架/业务版本记录在/opt/zelo-pre/state/auto-update.json。
 
 ### 从私有 Git 仓库发布业务包
 
@@ -96,18 +98,18 @@ sudo bash deploy/server/configure-tls.sh certificate-contact@example.com
 
 域名A记录须指向服务器，80/443可达。TLS脚本申请证书、保留nginx的维护判断、启用自动续期并运行renew --dry-run；它只有在真实环境执行成功后才代表证书可用。安装器不下载安装Node或更改其他业务服务，遇到现有Preview配置时拒绝覆盖。已有Preview服务或数据需先停机、备份并核对目录，再迁入独立数据目录；不要用新安装覆盖旧现场。
 
-生成的服务账号为preview；/opt/preview/scripts由root维护，/opt/preview/releases与state由preview维护。配置在/etc/preview/deploy.json，含独立安装根、存储根、固定publicOrigin、API端口及Node可执行路径。API仅监听127.0.0.1，入口统一经nginx。Nginx覆盖客户端提交的X-Forwarded-For，稳定启动器仅信任回环代理提供的单一客户端IP。保护以下目录，不能通过nginx alias/root公开：
+生成的服务账号为preview；/opt/zelo-pre/scripts由root维护，/opt/zelo-pre/releases与state由preview维护。配置在/etc/zelo-pre/deploy.json，含独立安装根、存储根、固定publicOrigin、API端口及Node可执行路径。API仅监听127.0.0.1，入口统一经nginx。Nginx覆盖客户端提交的X-Forwarded-For，稳定启动器仅信任回环代理提供的单一客户端IP。保护以下目录，不能通过nginx alias/root公开：
 
 | 目录                      | 用途                                    |
 | ------------------------- | --------------------------------------- |
-| /opt/preview/releases     | 完整版本和current.json；账号库不在这里  |
-| /opt/preview/state        | 部署锁、事务日志和维护标记              |
-| /var/lib/preview/data     | 私有platform.sqlite、WAL与会话/授权数据 |
-| /var/lib/preview/backups  | 迁移前备份及失败数据库副本              |
-| /var/lib/preview/media    | 独立保存的休息音频及封面                |
-| /var/lib/preview/incoming | CI上传压缩包                            |
+| /opt/zelo-pre/releases     | 完整版本和current.json；账号库不在这里  |
+| /opt/zelo-pre/state        | 部署锁、事务日志和维护标记              |
+| /var/lib/zelo-pre/data     | 私有platform.sqlite、WAL与会话/授权数据 |
+| /var/lib/zelo-pre/backups  | 迁移前备份及失败数据库副本              |
+| /var/lib/zelo-pre/media    | 独立保存的休息音频及封面                |
+| /var/lib/zelo-pre/incoming | CI上传压缩包                            |
 
-为preview账号安装专用SSH公钥到/var/lib/preview/.ssh/authorized_keys，.ssh权限700、authorized_keys权限600、所有者preview。建议为公钥添加restrict选项，禁用端口转发和PTY。私钥只保存在GitHub Secrets；不要上传仓库。安装器仅授予preview免密start/stop preview.service，不授予通用root命令。
+为preview账号安装专用SSH公钥到/var/lib/zelo-pre/.ssh/authorized_keys，.ssh权限700、authorized_keys权限600、所有者preview。建议为公钥添加restrict选项，禁用端口转发和PTY。私钥只保存在GitHub Secrets；不要上传仓库。安装器仅授予preview免密start/stop preview.service，不授予通用root命令。
 
 GitHub仓库设置：
 
@@ -126,8 +128,8 @@ deploy job使用production environment；需要无人值守时，环境不能设
 sudo -u preview bash
 read -rsp '管理员密码（至少8字符）: ' PREVIEW_ADMIN_PASSWORD
 export PREVIEW_ADMIN_PASSWORD
-release_id=$(node -p "JSON.parse(require('fs').readFileSync('/opt/preview/releases/current.json','utf8')).releaseId")
-node "/opt/preview/releases/$release_id/runtime/admin.mjs" --data /var/lib/preview/data --username owner --name 管理员 --with-projects
+release_id=$(node -p "JSON.parse(require('fs').readFileSync('/opt/zelo-pre/releases/current.json','utf8')).releaseId")
+node "/opt/zelo-pre/releases/$release_id/runtime/admin.mjs" --data /var/lib/zelo-pre/data --username owner --name 管理员 --with-projects
 unset PREVIEW_ADMIN_PASSWORD
 exit
 ```
@@ -136,13 +138,13 @@ exit
 
 `--with-projects`同时建立工程已登记的项目，使用清单中的初始菜单与访问范围。带该选项重复执行时验证已有管理员密码，只补缺少的项目，现有名称、菜单、归档状态和授权继续由数据库管理。
 
-如果沿用本机配置，先通过`backup.mjs backup`取得一致SQLite备份，单独传入服务器的私有目录。首次发行前使用`backup.mjs restore --backup <snapshot.sqlite> --data /var/lib/preview/data --service-stopped`恢复到空目录；有数据库的目标会拒绝覆盖。该路径保留原账号、项目、菜单与授权，管理员使用原账号登录。数据库、音乐与公开发行包分开传输。
+如果沿用本机配置，先通过`backup.mjs backup`取得一致SQLite备份，单独传入服务器的私有目录。首次发行前使用`backup.mjs restore --backup <snapshot.sqlite> --data /var/lib/zelo-pre/data --service-stopped`恢复到空目录；有数据库的目标会拒绝覆盖。该路径保留原账号、项目、菜单与授权，管理员使用原账号登录。数据库、音乐与公开发行包分开传输。
 
 休息媒体仅接受`media/rest-track.mp3`与`media/rest-artwork.jpg`两个固定文件。通过preview账号写入私有media目录后，完整服务在首页注入固定的同源媒体地址，并提供音频Range请求；发行更新和代码回退沿用该目录。文件缺失时使用本地音频选择和内置封面，CSP允许本地blob音频。原录音及封面继续按已确认的分发范围使用。
 
 ```bash
-sudo install -o preview -g preview -m 600 <audio.mp3> /var/lib/preview/media/rest-track.mp3
-sudo install -o preview -g preview -m 600 <artwork.jpg> /var/lib/preview/media/rest-artwork.jpg
+sudo install -o preview -g preview -m 600 <audio.mp3> /var/lib/zelo-pre/media/rest-track.mp3
+sudo install -o preview -g preview -m 600 <artwork.jpg> /var/lib/zelo-pre/media/rest-artwork.jpg
 ```
 
 已有安装需同步升级root维护的supervisor工具，才能把媒体目录与可信代理配置传入API；日常应用发行继续由原部署事务执行。媒体与SQLite均纳入私有备份安排，恢复时分别校验文件。
@@ -152,9 +154,9 @@ sudo install -o preview -g preview -m 600 <artwork.jpg> /var/lib/preview/media/r
 可在Actions的Run workflow中选择rollback或recover，也可服务器执行：
 
 ```bash
-sudo -u preview node /opt/preview/scripts/deploy.mjs status
-sudo -u preview node /opt/preview/scripts/deploy.mjs rollback
-sudo -u preview node /opt/preview/scripts/deploy.mjs recover
+sudo -u preview node /opt/zelo-pre/scripts/deploy.mjs status
+sudo -u preview node /opt/zelo-pre/scripts/deploy.mjs rollback
+sudo -u preview node /opt/zelo-pre/scripts/deploy.mjs recover
 systemctl status preview.service
 journalctl -u preview.service --since today
 ```

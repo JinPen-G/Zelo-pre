@@ -8,7 +8,7 @@ import { readDeploymentConfig, prepareDeploymentPaths, readJson, RELEASE_ID } fr
 import { verifyRelease } from './release.mjs';
 const position = process.argv.indexOf('--config');
 const config = await readDeploymentConfig(
-  position < 0 ? '/etc/preview/deploy.json' : process.argv[position + 1],
+  position < 0 ? '/etc/zelo-pre/deploy.json' : process.argv[position + 1],
 );
 await prepareDeploymentPaths(config);
 const transaction = await readJson(path.join(config.stateRoot, 'transaction.json'));

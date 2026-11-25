@@ -38,13 +38,14 @@ const project = vi.hoisted(() => ({
   ],
   links: [],
 }));
+const platformSettings = vi.hoisted(() => ({ brandName: 'Preview' as string | undefined }));
 vi.mock('./platform-api', () => ({
   useNativeAuth: () => ({
     session: { user: { id: 'test-user', role: 'admin', revision: 1, displayName: '管理员' } },
     loading: false,
   }),
   useNativeQuery: (route: string) => ({
-    data: route === '/projects' ? [project] : route === '/settings' ? { brandName: 'Preview' } : project,
+    data: route === '/projects' ? [project] : route === '/settings' ? platformSettings : project,
     isPending: false,
   }),
 }));
@@ -82,6 +83,7 @@ vi.mock('@preview/ui', async (original) => ({
     sections,
     selectedKey,
     subtitle,
+    title,
     workspaceKey,
     navigationMode,
     onNavigate,
@@ -91,12 +93,13 @@ vi.mock('@preview/ui', async (original) => ({
     sections: { key: string; label: string; routes: { key: string; label: string }[] }[];
     selectedKey: string;
     subtitle: string;
+    title: string;
     workspaceKey: string;
     navigationMode: string;
     onNavigate: (path: string) => void;
     onNavigationModeChange: (mode: string) => void;
   }) => (
-    <div data-testid="shell" data-workspace={workspaceKey} data-subtitle={subtitle}>
+    <div data-testid="shell" data-workspace={workspaceKey} data-subtitle={subtitle} data-title={title}>
       <button onClick={() => onNavigationModeChange(navigationMode === 'admin' ? 'components' : 'admin')}>
         切换工作模式
       </button>
@@ -136,6 +139,7 @@ function CurrentPath() {
   );
 }
 beforeEach(() => {
+  platformSettings.brandName = 'Preview';
   vi.stubGlobal(
     'IntersectionObserver',
     class {
@@ -144,6 +148,26 @@ beforeEach(() => {
       disconnect() {}
     },
   );
+});
+
+test.each([
+  ['Preview', 'Zelo pre'],
+  ['', 'Zelo pre'],
+  [undefined, 'Zelo pre'],
+  ['My workspace', 'My workspace'],
+])('displays the brand %s as %s without changing saved settings', async (stored, displayed) => {
+  platformSettings.brandName = stored;
+  render(
+    <MemoryRouter initialEntries={['/projects/test-project/settings']}>
+      <Suspense>
+        <NativeIdentityGate />
+      </Suspense>
+    </MemoryRouter>,
+  );
+  await screen.findByLabelText('项目说明草稿');
+  expect(screen.getByTestId('shell')).toHaveAttribute('data-title', displayed);
+  expect(document.title).toBe(displayed);
+  expect(platformSettings.brandName).toBe(stored);
 });
 afterEach(() => {
   cleanup();

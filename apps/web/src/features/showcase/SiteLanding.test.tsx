@@ -124,8 +124,8 @@ it('copies complete current-origin commands and keeps tokens as placeholders', a
   fireEvent.click(within(hero).getByRole('button', { name: '复制接入命令' }));
   await waitFor(() => expect(clipboard).toHaveBeenCalledWith(expected[1].command));
   const configuration = JSON.parse(expected[1].command);
-  expect(configuration.mcpServers.preview.url).toBe(`${window.location.origin}/api/project-context/mcp`);
-  expect(configuration.mcpServers.preview.headers.Authorization).toBe('Bearer <project-read-only-token>');
+  expect(configuration.mcpServers['zelo-pre'].url).toBe(`${window.location.origin}/api/project-context/mcp`);
+  expect(configuration.mcpServers['zelo-pre'].headers.Authorization).toBe('Bearer <project-read-only-token>');
 });
 
 it('reports clipboard failure and allows a successful retry', async () => {
@@ -164,7 +164,7 @@ it('shows actual MCP reading steps and asks about adopting governance independen
   expect(
     within(footer)
       .getAllByRole('link', { name: 'GitHub' })
-      .every((link) => link.getAttribute('href') === 'https://github.com/JinPen-G/Preview'),
+      .every((link) => link.getAttribute('href') === 'https://github.com/JinPen-G/Zelo-pre'),
   ).toBe(true);
 });
 
@@ -190,7 +190,7 @@ it('pauses decorative examples off screen and after focus, then releases timers 
   expect(clipboard).toHaveBeenCalledTimes(calls);
 });
 
-it('scrubs card extraction from scroll progress, holds at rest and reverses to the same stack', () => {
+it('scrubs the snail from scroll progress, holds at rest and reverses to the same pose', () => {
   vi.useFakeTimers();
   const progress = motionValue(20);
   const view = render(
@@ -198,24 +198,20 @@ it('scrubs card extraction from scroll progress, holds at rest and reverses to t
       <ShuffleLogo progress={progress} />
     </AnimateUIProvider>,
   );
-  const cards = () =>
-    [...view.container.querySelectorAll('[data-card]')].map((card) => card.getAttribute('transform'));
-  const order = () =>
-    [...view.container.querySelector('[data-drawing]')!.children].map((card) =>
-      card.getAttribute('data-card-wrapper'),
-    );
-  const initial = cards();
-  expect(order()).toEqual(['0', '1', '2', '3']);
+  const pose = () => view.container.querySelector('[data-snail]')!.getAttribute('transform');
+  const initial = pose();
+  const outline = view.container.querySelector('[data-snail] path')!.getAttribute('d');
   act(() => vi.advanceTimersByTime(6400));
-  expect(cards()).toEqual(initial);
+  expect(pose()).toEqual(initial);
   act(() => progress.set(36));
-  expect(cards()).not.toEqual(initial);
-  expect(order()).toEqual(['3', '0', '1', '2']);
+  expect(pose()).not.toEqual(initial);
+  expect(view.container.querySelector('[data-snail] path')).toHaveAttribute('d', outline);
   act(() => progress.set(20));
-  expect(cards()).toEqual(initial);
-  expect(order()).toEqual(['0', '1', '2', '3']);
+  expect(pose()).toEqual(initial);
   act(() => progress.set(100));
-  expect(order()).toEqual(['0', '1', '2', '3']);
+  const settled = pose();
+  act(() => progress.set(0));
+  expect(pose()).toEqual(settled);
   view.unmount();
   act(() => progress.set(50));
   progress.destroy();

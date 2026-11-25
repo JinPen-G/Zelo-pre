@@ -92,7 +92,7 @@ function NativeWorkspace({ session, onLogout }: { session: DemoSession; onLogout
   if (!validRoutes.includes(pathname)) return <Navigate to="/manage/projects" replace />;
   return (
     <FrameworkShell
-      title="Preview"
+      title="Zelo pre"
       subtitle={workspaces.find((workspace) => workspace.key === workspaceKey)!.label}
       workspaces={workspaces}
       workspaceKey={workspaceKey}
@@ -167,7 +167,7 @@ function PreviewWorkspace() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   useEffect(() => {
-    document.title = 'Preview';
+    document.title = 'Zelo pre';
   }, []);
   const logout = () => {
     clearDemoSession();

@@ -134,7 +134,7 @@ export default function RequirementGraphPage({
     { client, session } = useNativeAuth(),
     reduced = useReducedMotion();
   useEffect(() => {
-    document.title = `${text(title)} · Preview`;
+    document.title = `${text(title)} · Zelo pre`;
   }, [text, title]);
   const [params, setParams] = useSearchParams();
   const view: ReadingMode = params.get('view') === 'flow' ? 'flow' : 'relations';

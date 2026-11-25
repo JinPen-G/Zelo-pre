@@ -22,16 +22,16 @@ const [major, minor] = process.versions.node.split('.').map(Number);
 if (major !== 24 || minor < 13) throw new Error('Node 24.13.0 or newer 24.x is required');
 NODE
 for name in deploy supervisor backup; do [[ -f "$source_root/output/tools/$name.mjs" ]] || { echo 'Run npm run build:runtime before installation' >&2; exit 1; }; done
-[[ ! -e /etc/preview/deploy.json && ! -e /etc/systemd/system/preview.service && ! -e /etc/nginx/conf.d/preview.conf && ! -e /etc/sudoers.d/preview ]] || { echo 'Installation already exists; preserve configuration and upgrade deliberately' >&2; exit 1; }
-getent passwd preview >/dev/null || useradd --system --create-home --home-dir /var/lib/preview --shell /bin/bash preview
-install -d -m 755 /opt/preview /opt/preview/scripts /opt/preview/state /etc/preview
-install -d -o preview -g preview -m 700 /opt/preview/releases /var/lib/preview/data /var/lib/preview/backups /var/lib/preview/media
-install -d -o preview -g preview -m 755 /var/lib/preview /var/lib/preview/incoming
-chown preview:preview /opt/preview/state
-for name in deploy supervisor backup; do install -m 644 "$source_root/output/tools/$name.mjs" "/opt/preview/scripts/$name.mjs"; done
+[[ ! -e /etc/zelo-pre/deploy.json && ! -e /etc/systemd/system/preview.service && ! -e /etc/nginx/conf.d/preview.conf && ! -e /etc/sudoers.d/preview ]] || { echo 'Installation already exists; preserve configuration and upgrade deliberately' >&2; exit 1; }
+getent passwd preview >/dev/null || useradd --system --create-home --home-dir /var/lib/zelo-pre --shell /bin/bash preview
+install -d -m 755 /opt/zelo-pre /opt/zelo-pre/scripts /opt/zelo-pre/state /etc/zelo-pre
+install -d -o preview -g preview -m 700 /opt/zelo-pre/releases /var/lib/zelo-pre/data /var/lib/zelo-pre/backups /var/lib/zelo-pre/media
+install -d -o preview -g preview -m 755 /var/lib/zelo-pre /var/lib/zelo-pre/incoming
+chown preview:preview /opt/zelo-pre/state
+for name in deploy supervisor backup; do install -m 644 "$source_root/output/tools/$name.mjs" "/opt/zelo-pre/scripts/$name.mjs"; done
 "$node_path" --input-type=module - "$origin" "$node_path" "$api_port" <<'NODE'
 import { writeFileSync } from 'node:fs';
-writeFileSync('/etc/preview/deploy.json', JSON.stringify({ schemaVersion: 1, installRoot: '/opt/preview', storageRoot: '/var/lib/preview', publicOrigin: process.argv[2], port: Number(process.argv[4]), service: 'preview.service', node: process.argv[3] }, null, 2) + '\n', { mode: 0o644 });
+writeFileSync('/etc/zelo-pre/deploy.json', JSON.stringify({ schemaVersion: 1, installRoot: '/opt/zelo-pre', storageRoot: '/var/lib/zelo-pre', publicOrigin: process.argv[2], port: Number(process.argv[4]), service: 'preview.service', node: process.argv[3] }, null, 2) + '\n', { mode: 0o644 });
 NODE
 sed "s|@NODE@|$node_path|g" "$source_root/deploy/server/preview.service" > /etc/systemd/system/preview.service
 sed "s|@NODE@|$node_path|g" "$source_root/deploy/server/preview-recovery.service" > /etc/systemd/system/preview-recovery.service

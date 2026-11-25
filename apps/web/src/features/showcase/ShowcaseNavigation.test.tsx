@@ -38,7 +38,7 @@ vi.mock('./SiteDocumentation', () => ({
 }));
 vi.mock('./SiteLanding', () => ({ SiteLanding: () => <h1>网站首页</h1> }));
 vi.mock('../../../../../packages/preview-ui/src/BrandOpening', () => ({
-  BrandOpening: () => <span>Preview</span>,
+  BrandOpening: () => <span>Zelo pre</span>,
 }));
 vi.mock('./showcase-catalog', async (importOriginal) => {
   const entries = [
@@ -379,7 +379,7 @@ describe('showcase catalog navigation', () => {
     expect(within(header).queryByRole('button', { name: '选择休息时长' })).not.toBeInTheDocument();
     fireEvent.click(navigation);
     const drawer = await screen.findByRole('dialog', { name: '页面导航' });
-    expect(within(drawer).getByRole('link', { name: 'Nativark' })).toHaveAttribute(
+    expect(within(drawer).getByRole('link', { name: 'Zelo Saas' })).toHaveAttribute(
       'href',
       'https://rentaltest.rimo.pro:8080/',
     );
@@ -406,7 +406,7 @@ describe('showcase catalog navigation', () => {
     for (const link of screen.getAllByRole('link', { name: 'Try the demo' }))
       expect(link).toHaveAttribute('href', '/demo?project=rental');
     const navigation = screen.getByRole('navigation', { name: '主导航' });
-    const platform = within(navigation).getByRole('link', { name: 'Nativark' });
+    const platform = within(navigation).getByRole('link', { name: 'Zelo Saas' });
     expect(platform).toHaveAttribute('href', 'https://rentaltest.rimo.pro:8080/');
     expect(platform).toHaveAttribute('target', '_blank');
     expect(platform).toHaveAttribute('rel', 'noopener noreferrer');
@@ -415,7 +415,7 @@ describe('showcase catalog navigation', () => {
 
   it('keeps the front-end project after returning home instead of selecting the first catalog item', async () => {
     mount('/docs?project=rental');
-    fireEvent.click(screen.getByRole('link', { name: 'Preview' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Zelo pre' }));
     expect(await screen.findByRole('heading', { name: '网站首页' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Try the demo' })).toHaveAttribute(
       'href',

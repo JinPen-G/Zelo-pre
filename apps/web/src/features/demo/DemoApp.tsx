@@ -85,7 +85,7 @@ export function DemoWorkspace() {
   };
   const [passwordOpen, setPasswordOpen] = useState(false);
   const [logoutError, setLogoutError] = useState('');
-  const browserTitle = `${appearance ? text('外观与音效') : selected ? text(catalogPageTitle(selected)) : 'Demo'} · Preview`;
+  const browserTitle = `${appearance ? text('外观与音效') : selected ? text(catalogPageTitle(selected)) : 'Demo'} · Zelo pre`;
   useEffect(() => {
     document.title = browserTitle;
   }, [browserTitle]);

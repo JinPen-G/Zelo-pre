@@ -4,6 +4,37 @@
   object-fit: contain;
 }
 
+.wordmark {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  color: #000;
+}
+
+/* Shared by the early boot artwork and the ordinary navigation wordmark. */
+:global(.brand-preview-badge) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 1px 4px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-family: Arial, sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+:global([data-theme='dark']) .wordmark,
+:global(.login-card-brand) .wordmark {
+  color: #fff;
+}
+
 :global([data-theme='dark']) .icon,
 :global(.login-card-brand) .icon {
   filter: invert(1);

@@ -1,4 +1,4 @@
-name: Preview release
+name: Zelo pre release
 on:
   push:
     branches: [main]
@@ -80,11 +80,11 @@ jobs:
           case "$OPERATION" in
             deploy)
               archive="preview-release-${GITHUB_RUN_ID}.tar.gz"
-              scp -o BatchMode=yes -o StrictHostKeyChecking=yes output/preview-release.tar.gz "$DESTINATION:/var/lib/preview/incoming/$archive"
-              ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$DESTINATION" "/usr/bin/env node /opt/preview/scripts/deploy.mjs deploy --archive /var/lib/preview/incoming/$archive --sequence $GITHUB_RUN_ID"
+              scp -o BatchMode=yes -o StrictHostKeyChecking=yes output/preview-release.tar.gz "$DESTINATION:/var/lib/zelo-pre/incoming/$archive"
+              ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$DESTINATION" "/usr/bin/env node /opt/zelo-pre/scripts/deploy.mjs deploy --archive /var/lib/zelo-pre/incoming/$archive --sequence $GITHUB_RUN_ID"
               ;;
             rollback|recover)
-              ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$DESTINATION" "/usr/bin/env node /opt/preview/scripts/deploy.mjs $OPERATION"
+              ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$DESTINATION" "/usr/bin/env node /opt/zelo-pre/scripts/deploy.mjs $OPERATION"
               ;;
             *) exit 1 ;;
           esac

@@ -90,7 +90,8 @@ export function BrandOpening({
       <span ref={iconSlot} className="brand-opening-icon-slot" />
       <span ref={wordSlot} className="brand-opening-word-slot">
         <span ref={reserve} className="brand-opening-reserve">
-          Preview.
+          <span className="brand-opening-wordmark-reserve" />
+          <span className="brand-preview-badge">pre</span>
         </span>
       </span>
     </span>

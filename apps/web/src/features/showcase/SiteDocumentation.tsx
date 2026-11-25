@@ -65,7 +65,7 @@ export function SiteDocumentation({
   const guide = guides?.find((item) => item.id === navigation.id);
   const title = navigation.title;
   useEffect(() => {
-    const pageTitle = [text(title), catalog?.projectName, 'Preview'].filter(Boolean).join(' · ');
+    const pageTitle = [text(title), catalog?.projectName, 'Zelo pre'].filter(Boolean).join(' · ');
     const element = document.querySelector('head > title') ?? document.createElement('title');
     element.replaceChildren(pageTitle);
     if (!element.isConnected) document.head.append(element);

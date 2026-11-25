@@ -1,5 +1,13 @@
 {
-  "name": "preview",
+  "name": "zelo-pre",
+  "description": "Zelo pre - interactive React showcase, source distribution and MCP engineering governance",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JinPen-G/Zelo-pre.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JinPen-G/Zelo-pre/issues"
+  },
   "private": true,
   "version": "0.11.0",
   "type": "module",

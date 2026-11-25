@@ -611,17 +611,17 @@ const english: Record<string, string> = {
   文档导航: 'Guide navigation',
   上一篇: 'Previous',
   下一篇: 'Next',
-  '了解 Preview、页面如何组织，以及如何阅读原型与需求。':
-    'What Preview is, how pages are organized, and how to read prototypes and requirements.',
-  '什么是 Preview': 'What Preview is',
-  'Preview 将项目的交互页面、页面源码和业务 PRD 放在一起，方便浏览与评审。':
-    'Preview brings interactive project pages, their source and business requirements together for browsing and review.',
+  '了解 Zelo pre、页面如何组织，以及如何阅读原型与需求。':
+    'What Zelo pre is, how pages are organized, and how to read prototypes and requirements.',
+  '什么是 Zelo pre': 'What Zelo pre is',
+  'Zelo pre 将项目的交互页面、页面源码和业务 PRD 放在一起，方便浏览与评审。':
+    'Zelo pre brings interactive project pages, their source and business requirements together for browsing and review.',
   页面如何组织: 'How pages are organized',
   '左侧按业务功能分组，选择页面即可查看对应原型。文档菜单提供浏览、主题和 AI 接入指南。':
     'Pages are grouped by business function in the sidebar. Docs cover browsing, themes and AI access.',
   如何阅读页面: 'Reading a page',
   '预览用于操作列表、表单和弹窗；页面源码用于查看当前页面的 React 实现。':
-    'Try lists, forms and dialogs in Preview; open Code to inspect the React page implementation.',
+    'Try lists, forms and dialogs in Zelo pre; open Code to inspect the React page implementation.',
   '简短 PRD 展示在预览下方；较长 PRD 在下方保留关键信息，并在预览与源码之间提供文档标签查看全文。':
     'Short requirements appear below the preview. Longer documents show key points below and add a Docs tab between Preview and Code for the full text.',
   公开与授权页面: 'Public and restricted pages',
@@ -738,7 +738,7 @@ const english: Record<string, string> = {
     'Use your account to access authorized pages and requirements.',
   或使用账号: 'or use your account',
   '忘记密码？': 'Forgot password?',
-  '还没有账号？': 'New to Preview?',
+  '还没有账号？': 'New to Zelo pre?',
   联系管理员: 'Contact administrator',
   '账号由管理员创建并授权，请联系管理员。':
     'Contact the administrator to create an account and grant access.',
@@ -842,7 +842,7 @@ const english: Record<string, string> = {
   按授权访问: 'Authorized access',
   统一界面与交互: 'Consistent UI and interactions',
   随演示查看说明: 'Read alongside the demo',
-  '登录 Preview': 'Sign in to Preview',
+  '登录 Zelo pre': 'Sign in to Zelo pre',
   初始化平台管理员: 'Create the administrator',
   显示名称: 'Display name',
   账号: 'Account',
@@ -960,9 +960,9 @@ const english: Record<string, string> = {
   左营高铁站门市: 'Zuoying HSR station',
   驳二艺术特区中心: 'Pier-2 Art Center',
   营运端: 'Operations',
-  'Preview · 原型与业务需求': 'Preview · Prototypes and requirements',
-  'Preview · 原型页面与业务需求': 'Preview · Prototypes and requirements',
-  'Preview · 原型管理平台': 'Preview · Prototype platform',
+  'Zelo pre · 原型与业务需求': 'Zelo pre · Prototypes and requirements',
+  'Zelo pre · 原型页面与业务需求': 'Zelo pre · Prototypes and requirements',
+  'Zelo pre · 原型管理平台': 'Zelo pre · Prototype platform',
   '页面加载失败，请刷新重试：': 'Could not load the page. Refresh to retry:',
   '加载原型…': 'Loading prototype…',
   '读取页面…': 'Loading page…',

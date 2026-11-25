@@ -261,6 +261,7 @@ test('platform branding is revisioned and only administrators can change it', as
   const { store, admin } = await fixture();
   const user = member(store, admin, 'branding-viewer');
   const first = store.getSettings(admin);
+  expect(first.brandName).toBe('Zelo pre');
   const next = store.saveSettings(admin, { ...first, brandName: 'Preview Test', brandIcon: 'boxes' });
   expect(store.getSettings(user).brandName).toBe('Preview Test');
   expect(() => store.saveSettings(user, { ...next, brandName: 'forged' })).toThrow('管理员');

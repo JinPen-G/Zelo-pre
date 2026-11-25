@@ -1,17 +1,17 @@
 [Unit]
-Description=Preview native platform
+Description=Zelo pre native platform
 After=network.target preview-recovery.service
 StartLimitIntervalSec=60
 StartLimitBurst=5
-ConditionPathExists=|/opt/preview/releases/current.json
-ConditionPathExists=|/opt/preview/state/transaction.json
+ConditionPathExists=|/opt/zelo-pre/releases/current.json
+ConditionPathExists=|/opt/zelo-pre/state/transaction.json
 
 [Service]
 Type=simple
 User=preview
 Group=preview
-WorkingDirectory=/opt/preview
-ExecStart=@NODE@ /opt/preview/scripts/supervisor.mjs --config /etc/preview/deploy.json
+WorkingDirectory=/opt/zelo-pre
+ExecStart=@NODE@ /opt/zelo-pre/scripts/supervisor.mjs --config /etc/zelo-pre/deploy.json
 Restart=on-failure
 RestartSec=3
 TimeoutStopSec=20
@@ -21,7 +21,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectHome=true
 ProtectSystem=strict
-ReadWritePaths=/var/lib/preview/data /opt/preview/state
+ReadWritePaths=/var/lib/zelo-pre/data /opt/zelo-pre/state
 
 [Install]
 WantedBy=multi-user.target

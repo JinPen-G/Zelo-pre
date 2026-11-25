@@ -41,15 +41,15 @@ function mount(projectId: string, path = '/docs', projectGuide?: 'introduction' 
 }
 it('keeps platform documentation available without projects and unchanged by project context', () => {
   const instance = mount('');
-  expect(screen.getByRole('heading', { name: '什么是 Preview' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: '什么是 Zelo pre' })).toBeInTheDocument();
   expect(document.querySelector('.docs_docMain__jK5Ve .library-docs_section__WJnkm')).not.toBeNull();
   expect(screen.getByRole('link', { name: /下一篇\s*使用指南/ })).toHaveAttribute(
     'href',
     '/docs/installation',
   );
   instance.rerender(instance.view('another-project'));
-  expect(screen.getByRole('heading', { name: '什么是 Preview' })).toBeInTheDocument();
-  expect(document.title).toBe('介绍 · Preview');
+  expect(screen.getByRole('heading', { name: '什么是 Zelo pre' })).toBeInTheDocument();
+  expect(document.title).toBe('介绍 · Zelo pre');
   expect(request).not.toHaveBeenCalled();
 });
 it('shows the complete platform governance in a closed disclosure after MCP connection', () => {

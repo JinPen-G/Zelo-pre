@@ -50,11 +50,11 @@ if (home) {
 }
 void import('./main').catch((error: unknown) => {
   discardBrandBoot();
-  console.error('Preview startup failed', error);
+  console.error('Zelo pre startup failed', error);
   void import('./app/startup-error')
     .then(({ renderStartupFailure }) => renderStartupFailure())
     .catch((recoveryError: unknown) => {
-      console.error('Preview recovery UI failed to load', recoveryError);
+      console.error('Zelo pre recovery UI failed to load', recoveryError);
       // Keep a usable retry even when React or the independent recovery bundle cannot load.
       const failure = document.createElement('main');
       failure.className = 'preview-startup-error';

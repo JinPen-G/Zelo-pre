@@ -37,7 +37,7 @@ export function useShellLabels() {
     docs: text('文档中心', '文件中心', 'Documents'),
     workspace: text('项目工作台', '專案工作台', 'Workspace'),
     order: text('订单示例', '訂單範例', 'Order example'),
-    loginTitle: text('登录 Preview', '登入 Preview', 'Sign in to Preview'),
+    loginTitle: text('登录 Zelo pre', '登入 Zelo pre', 'Sign in to Zelo pre'),
     loginIntro: text('进入你的项目演示空间', '進入你的專案演示空間', 'Enter your project workspace'),
     username: text('账号', '帳號', 'Account'),
     password: text('密码', '密碼', 'Password'),

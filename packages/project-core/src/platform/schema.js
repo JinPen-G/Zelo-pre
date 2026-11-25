@@ -15,7 +15,7 @@ export function migrateNativeDatabase(database) {
       CREATE TABLE IF NOT EXISTS members (project_id TEXT NOT NULL REFERENCES projects(id), user_id TEXT NOT NULL REFERENCES accounts(id), role TEXT NOT NULL CHECK(role IN ('editor','viewer')), PRIMARY KEY(project_id,user_id));
       CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY, actor TEXT NOT NULL, action TEXT NOT NULL, target TEXT NOT NULL, at INTEGER NOT NULL, result TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY CHECK(id=1), brand_name TEXT NOT NULL, brand_icon TEXT NOT NULL, revision INTEGER NOT NULL DEFAULT 1);
-      INSERT OR IGNORE INTO settings(id,brand_name,brand_icon) VALUES(1,'Preview','layers');`);
+      INSERT OR IGNORE INTO settings(id,brand_name,brand_icon) VALUES(1,'Zelo pre','layers');`);
     if (
       !database
         .prepare('PRAGMA table_info(projects)')

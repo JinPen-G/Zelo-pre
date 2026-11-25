@@ -1,4 +1,4 @@
-/** Platform homepage: Animate UI composition with Preview copy and MCP entry points.
+/** Platform homepage: Animate UI composition with Zelo pre copy and MCP entry points.
  * Demonstrations are independent of business packages and do not make live MCP requests. */
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
@@ -21,7 +21,7 @@ import {
 import { useShowcaseText } from './showcase-locale';
 import { createLandingCommands } from './landing-copy';
 
-const REPOSITORY = 'https://github.com/JinPen-G/Preview';
+const REPOSITORY = 'https://github.com/JinPen-G/Zelo-pre';
 function Actions({
   primary = '接入 MCP',
   secondary = '浏览页面',
@@ -61,7 +61,7 @@ export function SiteLanding({ openingReady = true }: { openingReady?: boolean })
       id: 'requirements',
       label: text('读取需求'),
       preview: 'read',
-      prompt: text('连接 Preview MCP，找到相关需求，先说明规则和验收条件。'),
+      prompt: text('连接 Zelo pre MCP，找到相关需求，先说明规则和验收条件。'),
       steps: [
         text('调用 `get_project_context`，确认可读范围和资料版本'),
         text('用 `search_requirements` 查找，再用 `read_requirement` 读原文'),
@@ -158,7 +158,7 @@ export function SiteLanding({ openingReady = true }: { openingReady?: boolean })
         <section className="home-ai-section" data-slot="home-ai" aria-labelledby="home-agent-heading">
           <span className="home-ai-badge">
             <Bot size={14} />
-            Preview MCP
+            Zelo pre MCP
           </span>
           <h2 id="home-agent-heading">{text('把开发的上下文，交给 Agent。')}</h2>
           <p className="home-lead">

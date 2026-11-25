@@ -1,4 +1,4 @@
-# Preview API
+# Zelo pre API
 
 [main.mjs](main.mjs) 装配正式 Node 服务，独立于 Rental OS。真实账号、项目、菜单、授权和设置存入 SQLite，业务页面中的订单等操作仍是模拟交互。
 

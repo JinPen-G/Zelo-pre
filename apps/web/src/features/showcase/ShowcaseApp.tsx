@@ -37,6 +37,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import {
   SiteFrame,
   BrandIcon,
+  BrandWordmark,
   BrandOpening,
   ThemeDrawer,
   SITE_ACCENTS,
@@ -120,7 +121,7 @@ const Password = lazy(() =>
   import('@/features/platform/PasswordForm').then((module) => ({ default: module.PasswordForm })),
 );
 const publicClient = createNativeClient();
-const nativarkUrl = 'https://rentaltest.rimo.pro:8080/';
+const zeloSaasUrl = 'https://rentaltest.rimo.pro:8080/';
 const RequirementGraphPage = lazy(() => import('./RequirementGraphPage'));
 interface PageDetail extends CatalogPage {
   description?: string;
@@ -663,7 +664,7 @@ export function Detail({ page }: { page: CatalogPage }) {
               </motion.section>
             )}
             <footer className="showcase-foot">
-              <span>Preview · 原型与业务需求</span>
+              <span>Zelo pre · 原型与业务需求</span>
               <span>{detail?.contentRevision.slice(0, 12)}</span>
             </footer>
           </article>
@@ -931,7 +932,7 @@ function Site() {
       >
         <Menu size={18} />
       </button>
-      <Link className={home ? 'site-nav_brand__GnbJw' : 'page_brand__CmA8v'} to="/" aria-label="Preview">
+      <Link className={home ? 'site-nav_brand__GnbJw' : 'page_brand__CmA8v'} to="/" aria-label="Zelo pre">
         {home ? (
           <BrandOpening
             playIntro={homeIntroPending}
@@ -944,7 +945,7 @@ function Site() {
         ) : (
           <>
             <BrandIcon size={32} />
-            <span>Preview</span>
+            <BrandWordmark height={28} />
           </>
         )}
       </Link>
@@ -965,8 +966,8 @@ function Site() {
         </Link>
         <Link to="/docs/ai">AI 接入</Link>
         <Link to={demoDestination}>Try the demo</Link>
-        <a className="showcase-platform-link" href={nativarkUrl} target="_blank" rel="noopener noreferrer">
-          Nativark <ExternalLink size={13} aria-hidden="true" />
+        <a className="showcase-platform-link" href={zeloSaasUrl} target="_blank" rel="noopener noreferrer">
+          Zelo Saas <ExternalLink size={13} aria-hidden="true" />
         </a>
         {session?.user?.role === 'admin' && <Link to="/manage/projects">管理后台</Link>}
       </nav>
@@ -1020,11 +1021,11 @@ function Site() {
       </Link>
       <a
         className="showcase-demo-navigation showcase-platform-link"
-        href={nativarkUrl}
+        href={zeloSaasUrl}
         target="_blank"
         rel="noopener noreferrer"
       >
-        Nativark <ExternalLink size={13} aria-hidden="true" />
+        Zelo Saas <ExternalLink size={13} aria-hidden="true" />
       </a>
       <CatalogFilters
         inputRef={searchInput}

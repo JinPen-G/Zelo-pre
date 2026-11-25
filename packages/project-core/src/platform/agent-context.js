@@ -264,7 +264,7 @@ export function createAgentContext({
           projectId: project.id,
           id: 'changelog',
           source: 'platform',
-          title: 'Preview 更新日志',
+          title: 'Zelo pre 更新日志',
           contentRevision: platformUpdatesRevision,
           revision: platformUpdatesRevision,
           websiteUrl: `${publicOrigin}/#/docs/changelog`,
