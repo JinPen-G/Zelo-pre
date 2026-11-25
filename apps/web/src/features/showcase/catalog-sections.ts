@@ -11,13 +11,14 @@ export type CatalogKind = (typeof catalogSections)[number]['kind'];
 export type CatalogJumpKind = CatalogKind | 'graph';
 export const graphSection = { kind: 'graph', title: '知识图谱' } as const;
 export const diagramGuideTitles = { architecture: '平台架构图', 'mind-map': '平台脑图' } as const;
+export const diagramTabTitles = { architecture: '架构图', 'mind-map': '脑图' } as const;
 
 export function isDiagramGuide(id: string | undefined): id is ProjectDiagramGuideId {
   return id === 'architecture' || id === 'mind-map';
 }
 
 export function projectDiagramPath(projectId: string, id: ProjectDiagramGuideId) {
-  return `/docs/projects/${encodeURIComponent(projectId)}/${id}`;
+  return `/docs/projects/${encodeURIComponent(projectId)}/architecture${id === 'mind-map' ? '?view=mind-map' : ''}`;
 }
 
 export function projectGraphPath(projectId: string) {

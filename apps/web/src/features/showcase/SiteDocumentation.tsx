@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowUp, ArrowLeft, ArrowRight, ChevronRight, RefreshCw } from 'lucide-react';
 import { LoadingStage } from '@preview/ui/loading';
 import type { MarkdownHeading } from '@/features/docs/markdown';
@@ -12,8 +12,8 @@ import { useProjectGuides } from './project-guide-query';
 import { useTocNavigation } from './toc-navigation';
 import { TocSelection } from './TocSelection';
 import type { CatalogPage } from './showcase-catalog';
-import { diagramGuideTitles, isDiagramGuide, projectDiagramPath, projectGraphPath } from './catalog-sections';
-import { ProjectDiagramPreview } from './ProjectDiagramPreview';
+import { diagramTabTitles, isDiagramGuide, projectDiagramPath, projectGraphPath } from './catalog-sections';
+import { ProjectDiagramPreview, ProjectDiagramTabs } from './ProjectDiagramPreview';
 
 export function SiteDocumentation({
   path,
@@ -28,23 +28,42 @@ export function SiteDocumentation({
 }) {
   const text = useShowcaseText();
   const location = useLocation();
+  const navigate = useNavigate();
   const query = useProjectGuides(projectGuide ? projectId : '');
-  const diagram = isDiagramGuide(projectGuide) ? projectGuide : undefined;
+  const catalog = projectGuide ? (query.isError ? undefined : query.data) : undefined;
+  const diagramPage = isDiagramGuide(projectGuide);
+  const diagramGuides = catalog?.guides.filter((item) => isDiagramGuide(item.id)) ?? [];
+  const requestedView = new URLSearchParams(location.search).get('view');
+  const diagram = diagramPage
+    ? projectGuide === 'mind-map' || requestedView === 'mind-map'
+      ? 'mind-map'
+      : !requestedView &&
+          catalog &&
+          !diagramGuides.some((item) => item.id === 'architecture') &&
+          diagramGuides.some((item) => item.id === 'mind-map')
+        ? 'mind-map'
+        : 'architecture'
+    : undefined;
+  useEffect(() => {
+    if (projectGuide !== 'mind-map') return;
+    const params = new URLSearchParams(location.search);
+    params.set('view', 'mind-map');
+    navigate(`${projectDiagramPath(projectId, 'architecture')}?${params}`, { replace: true });
+  }, [projectGuide, projectId, location.search, navigate]);
   const guideIndex = Math.max(
     0,
     siteGuides.findIndex((item) => item.path === path),
   );
   const navigation = projectGuide
     ? {
-        id: projectGuide,
-        title: diagram ? diagramGuideTitles[diagram] : projectGuide === 'changelog' ? '更新记录' : '项目介绍',
+        id: diagram ?? projectGuide,
+        title: diagram ? '平台架构' : projectGuide === 'changelog' ? '更新记录' : '项目介绍',
         path,
       }
     : siteGuides[guideIndex];
-  const catalog = projectGuide ? (query.isError ? undefined : query.data) : undefined;
   const guides = projectGuide ? catalog?.guides : PLATFORM_GUIDES;
   const guide = guides?.find((item) => item.id === navigation.id);
-  const title = diagram ? (guide?.title ?? navigation.title) : navigation.title;
+  const title = navigation.title;
   useEffect(() => {
     const pageTitle = [text(title), catalog?.projectName, 'Preview'].filter(Boolean).join(' · ');
     const element = document.querySelector('head > title') ?? document.createElement('title');
@@ -59,6 +78,13 @@ export function SiteDocumentation({
       ? `/api/native/showcase/${encodeURIComponent(projectId)}/guide-preview?${new URLSearchParams({ id: diagram, contentRevision: catalog.contentRevision })}`
       : undefined;
   const restricted = catalog?.restrictedGuideIds?.some((identifier) => identifier === navigation.id);
+  const diagramViews = diagramGuides.flatMap((item) =>
+    isDiagramGuide(item.id) ? [{ id: item.id, label: text(diagramTabTitles[item.id]) }] : [],
+  );
+  const standaloneTabs = diagram && catalog && !diagramImage && !diagramSource && diagramViews.length > 0;
+  const changeDiagram = (id: ProjectDiagramGuideId) => {
+    if (id !== diagram) navigate(projectDiagramPath(projectId, id), { preventScrollReset: true });
+  };
   const [headings, setHeadings] = useState<MarkdownHeading[]>([]);
   const updateHeadings = useCallback(
     (next: MarkdownHeading[]) =>
@@ -78,7 +104,7 @@ export function SiteDocumentation({
   const { active, scrollTo } = useTocNavigation(sectionIds, 150);
   const guidePath = useCallback(
     (pathname: string, anchor?: string) =>
-      `${pathname}${anchor ? `?${new URLSearchParams({ anchor })}` : ''}`,
+      `${pathname}${anchor ? `${pathname.includes('?') ? '&' : '?'}${new URLSearchParams({ anchor })}` : ''}`,
     [],
   );
   const resolveDocumentUrl = useCallback(
@@ -123,57 +149,79 @@ export function SiteDocumentation({
               <div className="docs_titleRow__nNp4A">
                 <h1>{text(title)}</h1>
               </div>
-              {guide && <p data-preserve-language>{guide.description}</p>}
-            </div>
-          </header>
-          {projectGuide && !projectId ? (
-            <p>{text('尚未配置项目')}</p>
-          ) : projectGuide && query.isPending ? (
-            <LoadingStage label={text('读取项目指南…')} />
-          ) : projectGuide && query.isError ? (
-            <div className="showcase-error" role="alert">
-              <p>{text('项目指南读取失败')}</p>
-              <p>{query.error.message}</p>
-              <button className="showcase-button" type="button" onClick={() => void query.refetch()}>
-                <RefreshCw size={14} />
-                {text('重试')}
-              </button>
-            </div>
-          ) : !guide && restricted ? (
-            <div className="showcase-muted" role="alert">
-              <p>{text('此指南需要项目授权。')}</p>
-              <p>{text('请联系管理员获取当前项目的资料访问权限。')}</p>
-            </div>
-          ) : !guide ? (
-            <div className="showcase-muted" role="status">
-              <p>{text('此项目尚未发布这篇指南。')}</p>
-              {firstPage && (
-                <Link to={`/pages/${firstPage.projectId}/${firstPage.clientId}/${firstPage.pageKey}`}>
-                  {text('浏览当前项目')}
-                </Link>
+              {guide && (
+                <p data-preserve-language>
+                  {(diagram && diagramGuides.find((item) => item.id === 'architecture')?.description) ||
+                    guide.description}
+                </p>
               )}
             </div>
-          ) : (
-            <>
-              {diagramImage ? (
-                <ProjectDiagramPreview title={text(title)} imageUrl={diagramImage} />
-              ) : diagramSource ? (
-                <ProjectDiagramPreview title={text(title)} source={diagramSource} />
-              ) : null}
-              <div className="library-docs_body__P7yx7" data-preserve-language>
-                <GuideBody
-                  source={
-                    diagramSource ? guide.markdown.slice(diagramSource.length).trimStart() : guide.markdown
-                  }
-                  documentPath={guide.path}
-                  projectId={projectId}
-                  resolveDocumentUrl={resolveDocumentUrl}
-                  onHeadings={updateHeadings}
-                  activeAnchor={new URLSearchParams(location.search).get('anchor') ?? undefined}
-                />
-              </div>
-            </>
+          </header>
+          {standaloneTabs && (
+            <div className="docs_viewBar__TMird">
+              <ProjectDiagramTabs views={diagramViews} activeView={diagram} onViewChange={changeDiagram} />
+            </div>
           )}
+          <div
+            id={standaloneTabs ? 'diagram-panel' : undefined}
+            role={standaloneTabs ? 'tabpanel' : undefined}
+            aria-labelledby={standaloneTabs && guide ? `diagram-tab-${diagram}` : undefined}
+            aria-label={standaloneTabs && !guide ? text(title) : undefined}
+            tabIndex={standaloneTabs ? 0 : undefined}
+          >
+            {projectGuide && !projectId ? (
+              <p>{text('尚未配置项目')}</p>
+            ) : projectGuide && query.isPending ? (
+              <LoadingStage label={text('读取项目指南…')} />
+            ) : projectGuide && query.isError ? (
+              <div className="showcase-error" role="alert">
+                <p>{text('项目指南读取失败')}</p>
+                <p>{query.error.message}</p>
+                <button className="showcase-button" type="button" onClick={() => void query.refetch()}>
+                  <RefreshCw size={14} />
+                  {text('重试')}
+                </button>
+              </div>
+            ) : !guide && restricted ? (
+              <div className="showcase-muted" role="alert">
+                <p>{text('此指南需要项目授权。')}</p>
+                <p>{text('请联系管理员获取当前项目的资料访问权限。')}</p>
+              </div>
+            ) : !guide ? (
+              <div className="showcase-muted" role="status">
+                <p>{text('此项目尚未发布这篇指南。')}</p>
+                {firstPage && (
+                  <Link to={`/pages/${firstPage.projectId}/${firstPage.clientId}/${firstPage.pageKey}`}>
+                    {text('浏览当前项目')}
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <>
+                {diagram && (diagramImage || diagramSource) ? (
+                  <ProjectDiagramPreview
+                    title={`${text(title)} · ${text(diagramTabTitles[diagram])}`}
+                    {...(diagramImage ? { imageUrl: diagramImage } : { source: diagramSource! })}
+                    activeView={diagram}
+                    views={diagramViews}
+                    onViewChange={changeDiagram}
+                  />
+                ) : null}
+                <div className="library-docs_body__P7yx7" data-preserve-language>
+                  <GuideBody
+                    source={
+                      diagramSource ? guide.markdown.slice(diagramSource.length).trimStart() : guide.markdown
+                    }
+                    documentPath={guide.path}
+                    projectId={projectId}
+                    resolveDocumentUrl={resolveDocumentUrl}
+                    onHeadings={updateHeadings}
+                    activeAnchor={new URLSearchParams(location.search).get('anchor') ?? undefined}
+                  />
+                </div>
+              </>
+            )}
+          </div>
           {!projectGuide && (
             <nav className="docs_pager__7frTG" aria-label={text('文档导航')}>
               {guideIndex > 0 ? (

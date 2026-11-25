@@ -7,7 +7,7 @@
   padding: 16px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius, 12px);
-  background: #f7f9fb;
+  background: #fff;
 }
 
 #diagram-preview .requirement-graph-preview-label {
@@ -35,13 +35,13 @@
 }
 
 .project-diagram-preview .mermaid-diagram {
-  min-width: 540px;
+  min-width: 0;
   text-align: center;
 }
 
 .project-diagram-image {
-  width: min(100%, 1120px);
-  min-width: 540px;
+  width: min(100%, 1400px);
+  min-width: 0;
   margin-inline: auto;
 }
 
@@ -61,6 +61,22 @@
   height: 100%;
   border: 0;
   border-radius: 0;
+}
+
+.showcase-fullscreen-panel .project-diagram-preview:not([data-zoomed]) .project-diagram-image {
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+}
+
+.showcase-fullscreen-panel .project-diagram-preview:not([data-zoomed]) .project-diagram-image img {
+  height: 100%;
+  object-fit: contain;
+}
+
+.showcase-fullscreen-panel .project-diagram-preview[data-zoomed] .project-diagram-image {
+  width: 1400px;
+  max-width: none;
 }
 
 @media (max-width: 680px) {

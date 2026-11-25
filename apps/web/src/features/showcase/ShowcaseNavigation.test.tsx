@@ -278,24 +278,23 @@ describe('showcase catalog navigation', () => {
     expect(await screen.findByRole('textbox', { name: '搜索需求点' })).toBeInTheDocument();
     expect(screen.getByRole('complementary', { name: '项目页面导航' })).toBe(sidebar);
   });
-  it('opens a diagram directly below its project graph and keeps the selected guide searchable', async () => {
+  it('combines diagram guides below their project and keeps both views searchable', async () => {
     mount('/docs');
     const graphs = screen.getByRole('navigation', { name: '知识图谱' });
     expect(
       within(graphs)
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['RIMO Rental', '平台架构图', '平台脑图', '门市项目']);
+    ).toEqual(['RIMO Rental', '平台架构', '门市项目']);
     const rental = within(graphs).getByRole('group', { name: 'RIMO Rental' });
-    expect(within(rental).getByRole('link', { name: '平台架构图' })).toBeInTheDocument();
-    const mindMap = within(rental).getByRole('link', { name: '平台脑图' });
-    expect(mindMap).toHaveAttribute('href', '/docs/projects/rental/mind-map');
-    fireEvent.click(mindMap);
-    expect(await screen.findByRole('heading', { name: '平台脑图正文' })).toBeInTheDocument();
-    expect(mindMap).toHaveAttribute('aria-current', 'page');
+    const architecture = within(rental).getByRole('link', { name: '平台架构' });
+    expect(architecture).toHaveAttribute('href', '/docs/projects/rental/architecture');
+    fireEvent.click(architecture);
+    expect(await screen.findByRole('heading', { name: '文档介绍' })).toBeInTheDocument();
+    expect(architecture).toHaveAttribute('aria-current', 'page');
     const sidebar = screen.getByRole('complementary', { name: '项目页面导航' });
     fireEvent.change(within(sidebar).getByRole('textbox'), { target: { value: '脑图' } });
-    expect(within(graphs).getAllByRole('link')).toEqual([mindMap]);
+    expect(within(graphs).getAllByRole('link')).toEqual([architecture]);
   });
   it('opens the selected project graph, highlights its own row and remembers it for Demo', async () => {
     mount('/docs/projects/store/graph');

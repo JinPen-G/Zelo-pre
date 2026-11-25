@@ -862,7 +862,11 @@ function Site() {
   const isGraph = projectGuide === 'graph' || location.pathname === '/docs/graph';
   const graphProjectId = projectDocs?.[1] ?? displayedProject;
   const graphMenuKey = projectGraphPath(graphProjectId);
-  const sidebarActiveKey = isGraph ? graphMenuKey : location.pathname;
+  const sidebarActiveKey = isGraph
+    ? graphMenuKey
+    : diagramGuide
+      ? projectDiagramPath(graphProjectId, 'architecture')
+      : location.pathname;
   const graphPageProject = projectCatalog.data?.projects.find((project) => project.id === graphProjectId);
   const sidebarSearchTerm = filter.trim().toLowerCase();
   const graphProjects = (projectCatalog.data?.projects ?? []).flatMap((project) => {
@@ -870,7 +874,9 @@ function Site() {
       `${project.name} ${label} ${text(label)}`.toLowerCase().includes(sidebarSearchTerm);
     const guides = (project.diagramGuides ?? []).filter(
       (guide) =>
-        matches(guide.title) &&
+        matches(
+          `${guide.title} ${text(guide.title)} ${text('平台架构')} ${text('架构图')} ${text('脑图')}`,
+        ) &&
         (tier === 'all' || tier === (guide.access === 'public' ? 'public' : 'restricted')),
     );
     const showGraph =
@@ -1077,11 +1083,15 @@ function Site() {
                   <nav className="library-sidebar_sectionBody__qECt_" aria-label={text(title)}>
                     <div className="library-sidebar_rows__muylU">
                       {graphProjects.map((project) => {
-                        const rows = project.guides.map((guide) => ({
-                          path: projectDiagramPath(project.id, guide.id),
-                          label: guide.title,
-                          diagram: true,
-                        }));
+                        const rows = project.guides.length
+                          ? [
+                              {
+                                path: projectDiagramPath(project.id, 'architecture'),
+                                label: text('平台架构'),
+                                diagram: true,
+                              },
+                            ]
+                          : [];
                         if (project.showGraph)
                           rows.unshift({
                             path: projectGraphPath(project.id),
